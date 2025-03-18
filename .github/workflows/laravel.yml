@@ -16,8 +16,8 @@ jobs:
         env:
           MYSQL_ROOT_PASSWORD: root
           MYSQL_DATABASE: jejakpatroli
-          MYSQL_USER: user
-          MYSQL_PASSWORD: ""
+          MYSQL_USER: root
+          MYSQL_PASSWORD: root
         ports:
           - 3306:3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
@@ -56,10 +56,16 @@ jobs:
         sed -i 's/DB_CONNECTION=sqlite/DB_CONNECTION=mysql/' .env
         sed -i 's/DB_DATABASE=.*/DB_DATABASE=jejakpatroli/' .env
         sed -i 's/DB_USERNAME=.*/DB_USERNAME=root/' .env
-        sed -i 's/DB_PASSWORD=.*/DB_PASSWORD=""/' .env
+        sed -i 's/DB_PASSWORD=.*/DB_PASSWORD=root/' .env
         sed -i 's/DB_HOST=127.0.0.1/DB_HOST=127.0.0.1/' .env
     
     - name: Run Migrations
+      env:
+        DB_CONNECTION: mysql
+        DB_DATABASE: jejakpatroli
+        DB_USERNAME: root
+        DB_PASSWORD: root
+        DB_HOST: 127.0.0.1
       run: php artisan migrate --force
     
     - name: Execute Tests
@@ -67,6 +73,6 @@ jobs:
         DB_CONNECTION: mysql
         DB_DATABASE: jejakpatroli
         DB_USERNAME: root
-        DB_PASSWORD: ""
+        DB_PASSWORD: root
         DB_HOST: 127.0.0.1
       run: php artisan test
