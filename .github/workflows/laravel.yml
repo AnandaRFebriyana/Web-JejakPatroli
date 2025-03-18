@@ -11,14 +11,14 @@ jobs:
 
     runs-on: ubuntu-latest
 
-     services:
+    services:
       mysql:
         image: mysql:8
         env:
           MYSQL_ROOT_PASSWORD: root
           MYSQL_DATABASE: jejakpatroli
           MYSQL_USER: user
-          MYSQL_PASSWORD: 
+          MYSQL_PASSWORD: ""
         ports:
           - 3306:3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
@@ -62,6 +62,6 @@ jobs:
         DB_CONNECTION: mysql
         DB_DATABASE: jejakpatroli
         DB_USERNAME: root
-        DB_PASSWORD: 
+        DB_PASSWORD: ""
         DB_HOST: 127.0.0.1
       run: php artisan test
