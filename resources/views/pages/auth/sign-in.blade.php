@@ -53,9 +53,10 @@
                         </div>
                     </div>
                     <div class="absolute top-0 right-0 flex-col justify-center hidden w-6/12 h-full max-w-full px-3 pr-0 my-auto text-center flex-0 lg:flex">
-                        <div class="relative flex flex-col justify-center h-full bg-cover px-24 m-4 overflow-hidden bg-tosca rounded-xl ">
+                        <div class="relative flex flex-col justify-center h-full bg-gradient-to-b from-[#37B6E9] to-[#242C3B] px-24 m-4 overflow-hidden rounded-xl ">
                             <span class="absolute top-0 left-0 w-full h-full bg-center bg-cover bg-gradient-to-tl from-zinc-800 opacity-60"></span>
-                            <h3 class="z-20 mt-12 font-bold text-white typing-animation">Welcome to PatrolTrack !!!</h3>
+                            <img src="{{ asset('assets/img/logo-jejakpatroli.png') }}" alt="Logo Jejak Patroli" style="width: 240px; margin-bottom: 4px" class="z-10 mx-auto h-auto">
+                            <h3 class="z-20 mt-2 font-bold text-white typing-animation">Welcome back to Jejak Patroli !!!</h3>
                             <p class="z-20 text-white ">
                             Where monitoring field activities becomes effortless, ensuring real-time tracking 
                             and comprehensive reporting for security patrols and field observations.
