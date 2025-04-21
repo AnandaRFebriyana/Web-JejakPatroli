@@ -21,8 +21,8 @@ class DatabaseSeeder extends Seeder {
      */
     public function run(): void {
         Admin::create([
-            'name' => 'Fanidiya Tasya',
-            'email' => 'tasya@gmail.com',
+            'name' => 'Nanda',
+            'email' => 'admin@gmail.com',
             'password' => bcrypt('1234')
         ]);
         Guard::factory()->count(3)->create();

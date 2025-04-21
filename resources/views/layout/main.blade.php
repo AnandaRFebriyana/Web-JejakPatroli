@@ -1,28 +1,40 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="apple-touch-icon" sizes="100x100" href="{{ asset('assets/img/logo-jejakpatroli.png') }}" />
     <link rel="icon" type="image/png" href="{{ asset('assets/img/logo-jejakpatroli.png') }}" />
     <title>Patrol Track</title>
+
     {{-- Bootstrap --}}
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <!--     Fonts and icons     -->
-    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
-    <!-- Font Awesome Icons -->
-    <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
+
+    <!-- Google Fonts - Open Sans -->
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome Icons from CDNJS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet" />
+
     <!-- Nucleo Icons -->
     <link href="{{ asset('assets/css/nucleo-icons.css') }}" rel="stylesheet" />
     <link href="{{ asset('assets/css/nucleo-svg.css') }}" rel="stylesheet" />
+
     <!-- Popper -->
     <script src="https://unpkg.com/@popperjs/core@2"></script>
+
     <!-- Main Styling -->
     <link href="{{ asset('assets/css/argon-dashboard-tailwind.css?v=1.0.1') }}" rel="stylesheet" />
+
     <style>
+      /* Custom Styling */
+      body {
+        font-family: 'Open Sans', sans-serif; /* Apply Open Sans for text */
+      }
+
       input[type="date"]::-webkit-calendar-picker-indicator,
       input[type="time"]::-webkit-calendar-picker-indicator {
-          margin-right: 0.7rem; 
+        margin-right: 0.7rem; 
       }
 
       input[type="password"] {
@@ -38,25 +50,27 @@
     <main class="relative h-full max-h-screen transition-all duration-200 ease-in-out xl:ml-68 rounded-xl">
       @include('layout.navbar')
       
-    <!-- content -->
-    <div class="w-full px-6 py-6 mx-auto">
-      @yield('content')
-      @include('sweetalert::alert')
-    </div>
-    {{-- end content --}}
+      <!-- content -->
+      <div class="w-full px-6 py-6 mx-auto">
+        @yield('content')
+        @include('sweetalert::alert')
+      </div>
+      {{-- end content --}}
 
-  </main>
+    </main>
   </body>
+
+  <!-- Scripts -->
   <script src="{{ asset('assets/js/search.js') }}"></script>
   {{-- Bootstrap JS --}}
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="{{ asset('assets/js/modal.js') }}"></script>
 
-  <!-- plugin for charts  -->
+  <!-- Plugin for charts  -->
   <script src="{{ asset('assets/js/plugins/chartjs.min.js') }}" async></script>
-  <!-- plugin for scrollbar  -->
+  <!-- Plugin for scrollbar  -->
   <script src="{{ asset('assets/js/plugins/perfect-scrollbar.min.js') }}" async></script>
-  <!-- main script file  -->
+  <!-- Main script file  -->
   <script src="{{ asset('assets/js/argon-dashboard-tailwind.js?v=1.0.1') }}" async></script>
 </html>
