@@ -28,8 +28,9 @@
               <tr>
                 <th class="px-6 py-3 font-bold text-center uppercase align-middle bg-transparent border-b border-collapse shadow-none text-xxs border-b-solid tracking-none whitespace-nowrap">No</th>
                 <th class="px-6 py-3 font-bold text-center uppercase align-middle bg-transparent border-b border-collapse shadow-none text-xxs border-b-solid tracking-none whitespace-nowrap">Nama Satpam</th>
-                <th class="px-6 py-3 font-bold text-center uppercase text-xxs">Latitude</th>
-                <th class="px-6 py-3 font-bold text-center uppercase text-xxs">Longitude</th>
+                <th class="px-6 py-3 font-bold text-center uppercase text-xxs">Tanggal</th>
+                <th class="px-6 py-3 font-bold text-center uppercase text-xxs">Check In</th>
+                <th class="px-6 py-3 font-bold text-center uppercase text-xxs">Check Out</th>
                 <th class="px-6 py-3 font-bold text-center uppercase text-xxs">Aksi</th>
               </tr>
             </thead>
@@ -38,21 +39,10 @@
               <tr class="location-row">
                 <td class="p-2 text-center">{{ $index + 1 }}</td>
                 <td class="p-2 text-center">{{ $location->location_name }}</td>
-                <td class="p-2 text-center">{{ $location->latitude }}</td>
-                <td class="p-2 text-center">{{ $location->longitude }}</td>
+                <td class="p-2 text-center">{{ \Carbon\Carbon::parse($location->created_at)->format('Y-m-d') }}</td>
+                <td class="p-2 text-center">{{ $location->check_in }}</td>
+                <td class="p-2 text-center">{{ $location->check_out }}</td>
                 <td class="p-2 text-center">
-                  <!-- Tombol Edit -->
-                  <a href="javascript:void(0);" class="text-xs text-blue-500 locModalEditLink"
-                      data-location-id="{{ $location->id }}"
-                      data-bs-toggle="modal" data-bs-target="#locModalEdit">
-                    <i class="fas fa-edit"></i>
-                  </a>
-                  |
-                  <!-- Tombol Hapus -->
-                  <a href="/location/{{ $location->id }}" class="text-xs text-red-500" data-confirm-delete="true">
-                    <i class="fas fa-trash-alt"></i>
-                  </a>
-                  |
                   <!-- Tombol Show Tracking -->
                   <a href="{{ route('location.show', $location->id) }}" class="text-xs text-green-500">
                     <i class="fas fa-map-marked-alt"></i> Show Tracking
