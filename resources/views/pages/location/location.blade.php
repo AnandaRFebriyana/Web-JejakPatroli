@@ -17,41 +17,35 @@
             <span class="text-sm ease leading-5.6 absolute z-50 -ml-px flex h-full items-center whitespace-nowrap rounded-lg rounded-tr-none rounded-br-none border border-r-0 border-transparent bg-transparent py-2 px-2.5 text-center font-normal text-slate-500 transition-all">
               <i class="fas fa-search"></i>
             </span>
-            <input id="search" type="text" class="pl-9 text-sm focus:shadow-primary-outline ease w-1/100 leading-5.6 relative -ml-px block min-w-0 flex-auto rounded-lg border border-solid border-gray-300 dark:bg-slate-850 dark:text-white bg-white bg-clip-padding py-2 pr-3 text-gray-700 transition-all placeholder:text-gray-500 focus:border-blue-500 focus:outline-none focus:transition-shadow" placeholder="Cari Lokasi..." />
+            <input id="search" type="text" class="pl-9 text-sm focus:shadow-primary-outline ease w-1/100 leading-5.6 relative -ml-px block min-w-0 flex-auto rounded-lg border border-solid border-gray-300 dark:bg-slate-850 dark:text-white bg-white bg-clip-padding py-2 pr-3 text-gray-700 transition-all placeholder:text-gray-500 focus:border-blue-500 focus:outline-none focus:transition-shadow" placeholder="Cari Satpam" />
           </div>
         </div>
-    </div>
+      </div>
       <div class="flex-auto px-0 pt-0 pb-2">
         <div class="p-0 overflow-x-auto">
           <table class="items-center w-full mb-0 align-top border-collapse dark:border-white/40 text-slate-500">
             <thead class="align-bottom">
               <tr>
                 <th class="px-6 py-3 font-bold text-center uppercase align-middle bg-transparent border-b border-collapse shadow-none text-xxs border-b-solid tracking-none whitespace-nowrap">No</th>
-                <th class="px-6 py-3 font-bold text-center uppercase align-middle bg-transparent border-b border-collapse shadow-none text-xxs border-b-solid tracking-none whitespace-nowrap">Nama Lokasi</th>
-                <th class="px-6 py-3 font-semibold capitalize align-middle bg-transparent border-b border-collapse border-solid shadow-none dark:border-white/40 dark:text-white tracking-none whitespace-nowrap text-slate-400 opacity-70"></th>
+                <th class="px-6 py-3 font-bold text-center uppercase align-middle bg-transparent border-b border-collapse shadow-none text-xxs border-b-solid tracking-none whitespace-nowrap">Nama Satpam</th>
+                <th class="px-6 py-3 font-bold text-center uppercase text-xxs">Tanggal</th>
+                <th class="px-6 py-3 font-bold text-center uppercase text-xxs">Check In</th>
+                <th class="px-6 py-3 font-bold text-center uppercase text-xxs">Check Out</th>
+                <th class="px-6 py-3 font-bold text-center uppercase text-xxs">Aksi</th>
               </tr>
             </thead>
             <tbody>
               @foreach ($locations as $index => $location)
               <tr class="location-row">
-                <td class="p-2 text-center align-middle bg-transparent border-b dark:border-white/40 whitespace-nowrap shadow-transparent">
-                  <p class="mb-0 text-xs leading-tight dark:text-white dark:opacity-80 text-slate-400">{{ $index + 1 }}</p>
-                </td>
-                <td class="p-2 text-center align-middle bg-transparent border-b dark:border-white/40 whitespace-nowrap shadow-transparent">
-                  <p class="mb-0 text-xs leading-tight dark:text-white dark:opacity-80 text-slate-400">{{ $location->location_name }}</p>
-                </td>
-                <td class="p-2 text-center align-middle bg-transparent border-b dark:border-white/40 whitespace-nowrap shadow-transparent">
-                  <a href="javascript:void(0);" class="btn btn-secondary text-xs border-0 locModalEditLink"
-                    data-location-id="{{ $location->id }}" data-bs-toggle="modal" data-bs-target="#locModalEdit">
-                    <i class="fas fa-edit" aria-hidden="true"></i>
-                  </a>
-                  |
-                  <a href="/location/{{ $location->id }}" class="btn btn-danger text-xs border-0" data-confirm-delete="true">
-                    <i class="fas fa-trash-alt" aria-hidden="true"></i>
-                  </a>
-                  |
-                  <a href="/location/{{ $location->id }}" class="btn btn-primary text-xs border-0">
-                    <i class="fas fa-download" aria-hidden="true"></i>
+                <td class="p-2 text-center">{{ $index + 1 }}</td>
+                <td class="p-2 text-center">{{ $location->location_name }}</td>
+                <td class="p-2 text-center">{{ \Carbon\Carbon::parse($location->created_at)->format('Y-m-d') }}</td>
+                <td class="p-2 text-center">{{ $location->check_in }}</td>
+                <td class="p-2 text-center">{{ $location->check_out }}</td>
+                <td class="p-2 text-center">
+                  <!-- Tombol Show Tracking -->
+                  <a href="{{ route('location.show', $location->id) }}" class="text-xs text-green-500">
+                    <i class="fas fa-map-marked-alt"></i> Show Tracking
                   </a>
                 </td>
               </tr>
