@@ -38,7 +38,7 @@
                         @endforeach
                     @endif
                   </div>
-              </div>                                    
+              </div>
               </div>
               <div class="text-right">
                 <h6 class="text-md leading-normal dark:text-white">{{ \Carbon\Carbon::parse($report->created_at)->translatedFormat('l, d F Y') }}</h6>
