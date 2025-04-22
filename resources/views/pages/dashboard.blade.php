@@ -1,7 +1,7 @@
 @extends('layout.main')
 
 @section('content')
-    
+
   <!-- row 1 -->
   <div class="flex flex-wrap -mx-3">
     <!-- card1 -->
@@ -128,7 +128,7 @@
             </div>
           </div>
         </div>
-        
+
         <div class="overflow-x-auto">
           <table class="items-center w-full mb-4 align-top border-collapse border-gray-200 dark:border-white/40">
             <thead class="align-bottom">
