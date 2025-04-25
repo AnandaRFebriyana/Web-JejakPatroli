@@ -1,6 +1,12 @@
 @extends('pages.auth.main')
 
-@section('content')   
+@section('content')
+<style>
+    .bg-gradient-to-tl {
+        background-image: linear-gradient(0deg,rgba(36, 44, 59, 1) 0%, rgba(55, 182, 233, 1) 100%);
+        opacity: 1;
+    }    
+    </style>   
 <div class="container sticky top-0 z-sticky">
     <div class="flex flex-wrap -mx-3">
         <div class="w-full max-w-full px-3 flex-0"></div>
