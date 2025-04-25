@@ -8,7 +8,7 @@
       <div class="p-6 pb-0 mb-0 border-b-0 border-b-solid rounded-t-2xl border-b-transparent">
         <h6 class="dark:text-white">Data Satpam</h6>
         <div class="flex justify-end">
-            <a href="/guard/create" 
+            <a href="/guard/create"
             class="inline-block px-8 py-2 mb-4 font-bold leading-normal text-center text-white align-middle transition-all ease-in bg-tosca border-0 rounded-lg shadow-md cursor-pointer text-xs tracking-tight-rem hover:shadow-xs hover:-translate-y-px active:opacity-85">Tambah</a>
         </div>
         <div class="flex md:pr-4">
@@ -18,7 +18,7 @@
             </span>
             <input id="search" type="text" class="pl-9 text-sm focus:shadow-primary-outline ease w-1/100 leading-5.6 relative -ml-px block min-w-0 flex-auto rounded-lg border border-solid border-gray-300 dark:bg-slate-850 dark:text-white bg-white bg-clip-padding py-2 pr-3 text-gray-700 transition-all placeholder:text-gray-500 focus:border-blue-500 focus:outline-none focus:transition-shadow" placeholder="Cari Satpam..." />
           </div>
-        </div>         
+        </div>
     </div>
       <div class="flex-auto px-0 pt-0 pb-2">
         <div class="p-0 overflow-x-auto">
@@ -64,7 +64,7 @@
                 <td class="p-2 text-center align-middle bg-transparent border-b dark:border-white/40 whitespace-nowrap shadow-transparent">
                   <p class="mb-0 text-xs leading-tight dark:text-white dark:opacity-80 text-slate-400">{{ $guard->phone_number }}</p>
                 </td>
-                <td class="p-2 text-center align-middle bg-transparent border-b dark:border-white/40 whitespace-nowrap shadow-transparent">
+                <td class="p-2 text-center align-middle bg-transparent border-b dark:border-white/40 shadow-transparent break-words max-w-xs">
                   <p class="mb-0 text-xs leading-tight dark:text-white dark:opacity-80 text-slate-400">{{ $guard->address }}</p>
                 </td>
                 <td class="p-2 text-center align-middle bg-transparent border-b dark:border-white/40 whitespace-nowrap shadow-transparent">
@@ -86,7 +86,7 @@
                   <a href="/guard/{{ $guard->id }}" class="btn btn-danger text-xs border-0" data-confirm-delete="true">
                     <i class="fas fa-trash-alt" aria-hidden="true"></i>
                   </a>
-                </td>                      
+                </td>
               </tr>
               @endforeach
             </tbody>
