@@ -27,7 +27,7 @@
                           </div>
                         </div>
                         <div class="text-right">
-                          <h6 class="text-md leading-normal dark:text-white">{{ \Carbon\Carbon::parse($report->created_at)->translatedFormat('d F Y') }}</h6>
+                          <h7 class="text-md leading-normal dark:text-white">{{ \Carbon\Carbon::parse($report->created_at)->translatedFormat('d F Y') }}</h7>
                           <span class="text-sm leading-tight dark:text-white/80">{{ $report->created_at->format('H:i:s') }}</span>
                         </div>
                       </div>

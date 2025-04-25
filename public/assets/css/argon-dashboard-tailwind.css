@@ -656,8 +656,12 @@ h1, h2, h3 {
 }
 
 h4, h5, h6 {
-  font-weight: 600;
+  font-weight: 400;
 }
+h7 {
+    font-weight: 800;
+    display: block;
+  }
 
 h1 {
   font-size: 3rem;
@@ -685,7 +689,7 @@ h5 {
 }
 
 h6 {
-  font-size: 1rem;
+  font-size: 0.9rem;
   line-height: 1.625;
 }
 
@@ -2223,7 +2227,7 @@ h6 {
 
 .px-4 {
   padding-left: 1rem;
-  padding-right: 1rem;
+  padding-right: 0rem;
 }
 
 .py-2 {
@@ -2497,12 +2501,12 @@ h6 {
 }
 
 .text-sm {
-  font-size: 0.875rem;
+  font-size: 0.85rem;
   line-height: 1.5rem;
 }
 
 .text-xs {
-  font-size: 0.75rem;
+  font-size: 0.9rem;
   line-height: 1rem;
 }
 
@@ -2543,7 +2547,7 @@ h6 {
 }
 
 .font-semibold {
-  font-weight: 600;
+  font-weight: 1000;
 }
 
 .font-bold {
@@ -2567,7 +2571,7 @@ h6 {
 }
 
 .leading-normal {
-  line-height: 1.5;
+  line-height: normal;
 }
 
 .leading-tight {
