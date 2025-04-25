@@ -1,45 +1,28 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Tracking Realtime Satpam</title>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-    <style>
-        #map { height: 100vh; }
-    </style>
-</head>
-<body>
+@extends('layout.main')
 
-<div id="map"></div>
+@section('content')
+  <h2 class="text-xl font-bold mb-4 text-gray-800 dark:text-white">Tracking Lokasi Real Time: {{ $location->location_name }}</h2>
 
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-<script>
-    const map = L.map('map').setView([-7.8, 110.36], 15); // posisi default
+  <div id="map" style="height: 500px; border-radius: 12px; overflow: hidden;"></div>
+
+  {{-- Leaflet CSS & JS --}}
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+  <script>
+    // Koordinat fallback jika tidak ada data
+    const latitude = {{ $location->latitude ?? -8.157581 }};
+    const longitude = {{ $location->longitude ?? 113.722996 }};
+
+    const map = L.map('map').setView([latitude, longitude], 17);
+
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; OpenStreetMap'
+      attribution: '&copy; OpenStreetMap contributors'
     }).addTo(map);
 
-    let marker = null;
-
-    function updateLocation() {
-        fetch('/api/latest-tracking?satpam_id=1') // ganti ID sesuai satpam
-            .then(res => res.json())
-            .then(data => {
-                if (data.latitude && data.longitude) {
-                    const pos = [data.latitude, data.longitude];
-                    if (marker) {
-                        marker.setLatLng(pos);
-                    } else {
-                        marker = L.marker(pos).addTo(map).bindPopup("Satpam").openPopup();
-                    }
-                    map.setView(pos, 16);
-                }
-            });
-    }
-
-    setInterval(updateLocation, 3000);
-    updateLocation();
-</script>
-
-</body>
-</html>
+    L.marker([latitude, longitude])
+      .addTo(map)
+      .bindPopup("Lokasi: {{ $location->location_name }}")
+      .openPopup();
+  </script>
+@endsection

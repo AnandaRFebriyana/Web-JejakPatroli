@@ -50,8 +50,7 @@ class LocationController extends Controller {
      * Display the specified resource.
      */
     public function show(Location $location) {
-        $pdf = Pdf::loadview('pages.location.show', compact('location'));
-        return $pdf->download('barcode.pdf');
+        return redirect()->away("https://www.google.com/maps?q={$location->latitude},{$location->longitude}");
     }
 
     /**
