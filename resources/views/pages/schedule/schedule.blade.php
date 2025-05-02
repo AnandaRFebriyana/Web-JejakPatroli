@@ -114,7 +114,7 @@
                                                 <i class="fas fa-edit" aria-hidden="true"></i>
                                             </a>
                                             |
-                                            <a class="btn btn-danger text-xs border-0" data-confirm-delete="true">
+                                            <a href="/schedules/guard/{{ $schedule->id }}/delete" class="btn btn-danger text-xs border-0" data-confirm-delete="true">
                                                 <i class="fas fa-trash-alt" aria-hidden="true"></i>
                                             </a>
                                         </td>

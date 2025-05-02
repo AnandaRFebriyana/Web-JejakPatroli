@@ -77,7 +77,7 @@
                           <i class="fas fa-eye" aria-hidden="true"></i>
                         </a>
                         |
-                        <a class="btn btn-danger text-xs border-0" data-confirm-delete="true">
+                        <a href="/presence/{{ $attendance->id }}" class="btn btn-danger text-xs border-0" data-confirm-delete="true">
                           <i class="fas fa-trash-alt" aria-hidden="true"></i>
                         </a>
                       </td>
