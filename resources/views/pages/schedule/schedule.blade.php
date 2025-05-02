@@ -36,7 +36,7 @@
                                             <p class="mb-0 text-xs leading-tight dark:text-white dark:opacity-80 text-slate-400">{{ $shift->end_time }}</p>
                                         </td>
                                         <td class="p-2 text-center align-middle bg-transparent border-b dark:border-white/40 whitespace-nowrap shadow-transparent">
-                                            <a href="javascript:void(0);" class="btn btn-secondary text-xs border-0 shiftModalEditLink" 
+                                            <a href="javascript:void(0);" class="btn btn-secondary text-xs border-0 shiftModalEditLink"
                                                 data-shift-id="{{ $shift->id }}" data-bs-toggle="modal" data-bs-target="#shiftModalEdit">
                                                 <i class="fas fa-edit" aria-hidden="true"></i>
                                             </a>
@@ -44,7 +44,7 @@
                                             <a href="/schedules/shift/{{ $shift->id }}/delete" class="btn btn-danger text-xs border-0" data-confirm-delete="true">
                                                 <i class="fas fa-trash-alt" aria-hidden="true"></i>
                                             </a>
-                                        </td> 
+                                        </td>
                                     </tr>
                                     @endforeach
                                 </tbody>
@@ -84,7 +84,7 @@
                                 <option value="Minggu">Minggu</option>
                             </select>
                         </div>
-                        
+
                     </div>
                     <div class="flex-auto px-0 pt-0 pb-2">
                         <div class="p-0 overflow-x-auto">
@@ -114,10 +114,10 @@
                                                 <i class="fas fa-edit" aria-hidden="true"></i>
                                             </a>
                                             |
-                                            <a href="/schedules/guard/{{ $schedule->id }}/delete" class="btn btn-danger text-xs border-0" data-confirm-delete="true">
+                                            <a class="btn btn-danger text-xs border-0" data-confirm-delete="true">
                                                 <i class="fas fa-trash-alt" aria-hidden="true"></i>
                                             </a>
-                                        </td> 
+                                        </td>
                                     </tr>
                                     @endforeach
                                 </tbody>
