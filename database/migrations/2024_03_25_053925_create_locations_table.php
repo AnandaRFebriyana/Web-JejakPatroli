@@ -11,8 +11,11 @@ return new class extends Migration {
     public function up(): void {
         Schema::create('locations', function (Blueprint $table) {
             $table->id();
-            $table->string('location_name');
-            // $table->text('barcode')->nullable();
+            $table->decimal('latitude', 10, 8); // Kolom untuk menyimpan latitude
+            $table->decimal('longitude', 11, 8); // Kolom untuk menyimpan longitude
+            $table->foreignId('shift_id') // Kolom foreign key
+                  ->constrained('shifts') // Mengacu ke tabel shifts
+                  ->onDelete('cascade'); // Hapus data jika parent dihapus
         });
     }
 
@@ -21,6 +24,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('locations');
+        Schema::dropIfExists('locations'); // Hapus tabel locations
     }
 };
