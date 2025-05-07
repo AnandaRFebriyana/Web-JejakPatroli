@@ -5,7 +5,7 @@ use App\Http\Controllers\Api\AttendanceController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\ScheduleController;
 use Illuminate\Support\Facades\Route;
-
+use App\Http\Controllers\Api\LocationController;
 
 Route::post('/login', [UserController::class, 'login']);
 
@@ -21,7 +21,8 @@ Route::middleware('auth.guard')->group(function () {
     
     // schedule
     Route::get('/schedule', [ScheduleController::class, 'show']);
-
+    // map
+    Route::apiResource('locations', LocationController::class);
     // report
     Route::get('/history-report', [ReportController::class, 'getAll']);
     Route::post('/report/store', [ReportController::class, 'postReport']);
