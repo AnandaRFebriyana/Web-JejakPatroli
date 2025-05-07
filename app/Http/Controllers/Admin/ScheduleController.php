@@ -77,7 +77,9 @@ class ScheduleController extends Controller {
         $existingSchedule = Schedule::where('day', $rules['day'])
                             ->where(function ($query) use ($rules, $id) {
                                 $query->where('shift_id', $rules['shift_id'])
-                                      ->orWhere('guard_id', $rules['guard_id']);
+                                      ->where('guard_id', $rules['guard_id'])
+                                      ->where('id, '!=', $id')
+                                      ->exists();
                             })
                             ->where('id', '!=', $id)
                             ->exists();
