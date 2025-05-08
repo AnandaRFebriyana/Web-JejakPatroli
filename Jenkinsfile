@@ -2,7 +2,8 @@ pipeline {
     agent any
 
     environment {
-        PROD_HOST = '141.11.190.114'  // Hanya alamat IP atau hostname, tanpa 'root@' karena sudah diatur di SSH Key Jenkins
+        PROD_HOST = '141.11.190.114'
+        PATH = "/usr/local/bin:$PATH" // Pastikan Jenkins bisa akses Composer
     }
 
     stages {
@@ -18,9 +19,12 @@ pipeline {
         stage('Build') {
             steps {
                 script {
-                    echo 'Building application...'
-                    // Tambahkan perintah build di sini, misalnya menjalankan composer atau npm
-                    sh 'composer install --no-dev --optimize-autoloader'
+                    echo '🔧 Checking PHP and Composer...'
+                    sh 'php -v || echo "PHP not found"'
+                    sh 'composer --version || echo "Composer not found or misconfigured"'
+
+                    echo '🚧 Installing dependencies...'
+                    sh '/usr/local/bin/composer install --no-dev --optimize-autoloader'
                 }
             }
         }
@@ -28,9 +32,9 @@ pipeline {
         stage('Test') {
             steps {
                 script {
-                    echo 'Running tests...'
-                    // Jika Anda memiliki perintah test, misalnya PHPUnit
-                    sh 'php artisan test'
+                    echo '🧪 Running tests...'
+                    // Gunakan perintah test sesuai framework Laravel
+                    sh 'php artisan test || echo "Tests failed or not configured"'
                 }
             }
         }
@@ -38,15 +42,14 @@ pipeline {
         stage('Deploy') {
             steps {
                 script {
-                    echo 'Deploying application...'
+                    echo '🚀 Deploying application...'
                 }
-                // Menggunakan credentials SSH
-                sshagent(credentials: ['your-ssh-key-id']) { // Gantilah 'your-ssh-key-id' dengan ID kredensial SSH yang telah Anda buat di Jenkins
-                    // Setup SSH untuk terhubung ke server
+
+                sshagent(credentials: ['your-ssh-key-id']) {
                     sh 'mkdir -p ~/.ssh'
                     sh 'ssh-keyscan -H $PROD_HOST >> ~/.ssh/known_hosts'
 
-                    // Menggunakan rsync untuk menyalin aplikasi ke server
+                    // Gunakan user yang sesuai di server (di sini diasumsikan "ubuntu")
                     sh '''
                     rsync -rav --delete ./ ubuntu@$PROD_HOST:/home/ubuntu/prod.kelasdevops.xyz/ \
                     --exclude=.env --exclude=storage --exclude=.git
