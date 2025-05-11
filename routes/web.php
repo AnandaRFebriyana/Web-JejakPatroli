@@ -20,6 +20,7 @@ Route::middleware('auth:admin')->group(function (){
 
     Route::resource('/guard', GuardController::class);
     Route::get('/guard/{id}/account', [GuardController::class, 'getAccount']);
+    Route::get('/guard-photo/{id}', [GuardController::class, 'getPhoto']);
     Route::put('/guard/update/{id}', [GuardController::class, 'updatePass']);
 
     Route::resource('/presence', AttendanceController::class);
@@ -30,7 +31,7 @@ Route::middleware('auth:admin')->group(function (){
 
     Route::controller(ScheduleController::class)->group(function () {
         Route::get('/schedules', 'index');
-        
+
         Route::prefix('/schedules/guard')->group(function () {
             Route::get('/create', 'createGuard');
             Route::post('/store', 'storeGuard');
