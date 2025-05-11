@@ -82,9 +82,14 @@
                         data-guard-id="{{ $guard->id }}" data-bs-toggle="modal" data-bs-target="#passModalEdit">Ubah Password</a></li>
                     </ul>
                   </div>
-                  <a href="/guard/{{ $guard->id }}"  data-confirm-delete="true">
-                    <i class="fas fa-trash-alt" aria-hidden="true"></i>
-                  </a>
+                  <form action="{{ url('/guard/delete/' . $guard->id) }}" method="POST" style="display: inline;" onsubmit="return confirm('Yakin ingin menghapus data ini?')">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" style="background: none; border: none; color: rgb(75, 75, 75); cursor: pointer;">
+                        <i class="fas fa-trash-alt" aria-hidden="true"></i>
+                    </button>
+                </form>
+
                 </td>
               </tr>
               @endforeach

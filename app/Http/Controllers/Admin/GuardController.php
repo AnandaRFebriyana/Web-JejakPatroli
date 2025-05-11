@@ -111,10 +111,12 @@ class GuardController extends Controller {
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Guard $guard) {
-        Guard::destroy($guard->id);
-        // return redirect('/guard')->with('toast_success','Data has been deleted!');
-        return redirect('/guard')->with('success','Berhasil menghapus data!');
+        public function deleteGuard($id)
+    {
+        $guard = Guard::findOrFail($id);
+        $guard->delete();
+
+        return redirect()->route('guard.index')->with('success', 'Data satpam berhasil dihapus.');
     }
 
     public function getAccount($id) {

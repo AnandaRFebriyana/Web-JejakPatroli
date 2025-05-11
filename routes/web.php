@@ -23,6 +23,7 @@ Route::middleware('auth:admin')->group(function (){
     Route::get('/guard/{id}/account', [GuardController::class, 'getAccount']);
     Route::get('/guard-photo/{id}', [GuardController::class, 'getPhoto']);
     Route::put('/guard/update/{id}', [GuardController::class, 'updatePass']);
+    Route::delete('/guard/delete/{id}', [GuardController::class, 'deleteGuard']);
 
     Route::resource('/presence', AttendanceController::class);
     Route::post('/get-guard', [AttendanceController::class, 'getSatpam']);
