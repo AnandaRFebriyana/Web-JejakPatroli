@@ -85,7 +85,7 @@
                   <form action="{{ url('/guard/delete/' . $guard->id) }}" method="POST" style="display: inline;" onsubmit="return confirm('Yakin ingin menghapus data ini?')">
                     @csrf
                     @method('DELETE')
-                    <button type="submit" style="background: none; border: none; color: rgb(75, 75, 75); cursor: pointer;">
+                    <button type="submit" style="background: none; border: none; color: rgb(255, 0, 0); cursor: pointer;" class="btn btn-danger text-xs border-0">
                         <i class="fas fa-trash-alt" aria-hidden="true"></i>
                     </button>
                 </form>

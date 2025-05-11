@@ -155,14 +155,14 @@
                             <div class="mt-6 text-center">
                                 <h5 class="dark:text-white">{{ $guard->name }}</h5>
                                 <div class="mt-6 mb-2 dark:text-white/80">
-                                  <i class="mr-2 dark:text-white ni ni-send"></i>
-                                  {{ $guard->email }}
+                                    <i class="mr-2 dark:text-white ni ni-send"></i>
+                                    {{ $guard->email }}
                                 </div>
                                 <div class="mb-2 font-semibold leading-relaxed text-base dark:text-white/80">
-                                  <i class="mr-2 dark:text-white ni ni-pin-3"></i>
-                                  {{ $guard->address }}
+                                    <i class="mr-2 dark:text-white ni ni-pin-3"></i>
+                                    {{ $guard->address }}
                                 </div>
-                              </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -172,17 +172,17 @@
     </div>
 <script>
     function previewImage() {
-      const image = document.querySelector('#photo');
-      const imgPreview = document.querySelector('.img-preview');
+        const image = document.querySelector('#photo');
+        const imgPreview = document.querySelector('.img-preview');
 
-      imgPreview.style.display = 'block';
+        imgPreview.style.display = 'block';
 
-      const oFReader = new FileReader();
-      oFReader.readAsDataURL(image.files[0]);
+        const oFReader = new FileReader();
+        oFReader.readAsDataURL(image.files[0]);
 
-      oFReader.onload = function(oFREvent) {
+        oFReader.onload = function(oFREvent) {
         imgPreview.src = oFREvent.target.result;
-      }
+        }
     }
 </script>
 @endsection

@@ -18,7 +18,7 @@
         outline-offset: 2px; /* Slightly offset the outline for better visibility */
     }
 
-    </style>   
+    </style>
 <div class="container sticky top-0 z-sticky">
     <div class="flex flex-wrap -mx-3">
         <div class="w-full max-w-full px-3 flex-0"></div>
@@ -31,8 +31,8 @@
                 <div class="flex flex-wrap -mx-3">
                     <div class="flex flex-col w-full max-w-full px-3 mx-auto lg:mx-0 shrink-0 md:flex-0 md:w-7/12 lg:w-5/12 xl:w-4/12">
                         <div class="relative flex flex-col min-w-0 break-words bg-transparent border-0 shadow-none lg:py4 dark:bg-gray-950 rounded-2xl bg-clip-border">
-                            
-                            @if (session()->has('error'))        
+
+                            @if (session()->has('error'))
                                 <div class="alert alert-danger">
                                     <span class="message">{{ session('error') }}</span>
                                     <span class="close" onclick="this.parentElement.style.display='none';">&times;</span>
@@ -53,13 +53,19 @@
                                             <div class="invalid-feedback text-red-500 text-sm mt-1">{{ $message }}</div>
                                         @enderror
                                     </div>
-                                    <div class="mb-4">
+                                    <div class="mb-4 relative">
                                         <input type="password" id="password" name="password" placeholder="Password"
-                                            class="form-control focus:shadow-primary-outline dark:bg-gray-950 dark:placeholder:text-white/80 dark:text-white/80 text-sm leading-5.6 ease block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding p-3 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:border-fuchsia-300 focus:outline-none" />
+                                            class="form-control pr-10 focus:shadow-primary-outline dark:bg-gray-950 dark:placeholder:text-white/80 dark:text-white/80 text-sm leading-5.6 ease block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding p-3 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:border-fuchsia-300 focus:outline-none" />
+
+                                        <span onclick="togglePassword('password', this)"
+                                            class="absolute inset-y-0 right-0 flex items-center pr-3 cursor-pointer text-gray-500">
+                                            <i class="fas fa-eye-slash" id="icon-password"></i>
+                                        </span>
+
                                         @error('password')
                                             <div class="invalid-feedback text-red-500 text-sm mt-1">{{ $message }}</div>
                                         @enderror
-                                    </div>                                    
+                                    </div>
 
                                     <div class="text-center">
                                         <button type="submit"
@@ -76,7 +82,7 @@
                             <img src="{{ asset('assets/img/logo-jejakpatroli.png') }}" alt="Logo Jejak Patroli" style="width: 240px; margin-bottom: 4px" class="z-10 mx-auto h-auto">
                             <h3 class="z-20 mt-2 font-bold text-white typing-animation">Welcome back to Jejak Patroli !!!</h3>
                             <p class="z-20 text-white ">
-                            Where monitoring field activities becomes effortless, ensuring real-time tracking 
+                            Where monitoring field activities becomes effortless, ensuring real-time tracking
                             and comprehensive reporting for security patrols and field observations.
                             </p>
                         </div>
@@ -87,3 +93,20 @@
     </section>
 </main>
 @endsection
+
+<script>
+    function togglePassword(fieldId, iconSpan) {
+        const field = document.getElementById(fieldId);
+        const icon = iconSpan.querySelector('i');
+
+        if (field.type === "password") {
+            field.type = "text";
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+        } else {
+            field.type = "password";
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+        }
+    }
+</script>
