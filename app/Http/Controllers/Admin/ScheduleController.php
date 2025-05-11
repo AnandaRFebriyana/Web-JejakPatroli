@@ -16,14 +16,14 @@ class ScheduleController extends Controller {
         $title = 'Delete!';
         $text = "Are you sure you want to delete?";
         confirmDelete($title, $text);
-    
+
         // $guardId = $request->input('guard'); // sm kyk di urlnya
-        
+
         // $schedules = Schedule::when($guardId,
         // function ($query) use ($guardId) {
         //     $query->where('guard_id', $guardId);
         // })->latest('id')->paginate(10);
-        
+
         $day = $request->input('day');
 
         $schedules = Schedule::when($day,
@@ -77,7 +77,9 @@ class ScheduleController extends Controller {
         $existingSchedule = Schedule::where('day', $rules['day'])
                             ->where(function ($query) use ($rules, $id) {
                                 $query->where('shift_id', $rules['shift_id'])
-                                      ->orWhere('guard_id', $rules['guard_id']);
+                                      ->where('guard_id', $rules['guard_id'])
+                                      ->where('id', '!=', $id)
+                                      ->exists();
                             })
                             ->where('id', '!=', $id)
                             ->exists();
@@ -85,7 +87,7 @@ class ScheduleController extends Controller {
         if ($existingSchedule) {
             return redirect('/schedules')->with('info', 'Jadwal tersebut sudah tersedia.');
         }
-    
+
         Schedule::where('id', $id)->update($rules);
         return redirect('/schedules')->with('success', 'Berhasil mengubah data!');
     }

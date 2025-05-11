@@ -14,5 +14,12 @@ class Location extends Model {
     public function report() {
         return $this->hasMany(Report::class);
     }
+    public function attandancesRelation() {
+        return $this->hasMany(Guard::class, 'guard_id');
+    }
+    public function guardRelation() {
+        return $this->belongsTo(Guard::class, 'guard_id');
+    }
+
+
 }
-    

@@ -21,7 +21,8 @@ class ScheduleRequest extends FormRequest {
         return [
             'guard_id' => 'required',
             'shift_id' => 'required',
-            'day' => 'required'
+            'day' => 'required',
+            'schedule_date' => 'required|date',
         ];
     }
 

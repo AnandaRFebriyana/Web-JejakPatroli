@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\GuardController;
 use App\Http\Controllers\Admin\LocationController;
 use App\Http\Controllers\Admin\ScheduleController;
 use App\Http\Controllers\Admin\ReportController;
+
 use Illuminate\Support\Facades\Route;
 
 
@@ -26,8 +27,9 @@ Route::middleware('auth:admin')->group(function (){
     Route::resource('/presence', AttendanceController::class);
     Route::post('/get-guard', [AttendanceController::class, 'getSatpam']);
 
-    Route::resource('/location', LocationController::class);
+    Route::resource('/location', LocationController::class)->only('index','show');
     Route::resource('/report', ReportController::class);
+
 
     Route::controller(ScheduleController::class)->group(function () {
         Route::get('/schedules', 'index');
@@ -45,5 +47,7 @@ Route::middleware('auth:admin')->group(function (){
             Route::put('/{id}', 'updateShift');
             Route::delete('/{id}/delete', 'destroyShift');
         });
+
+
     });
 });

@@ -36,7 +36,7 @@
                                             <p class="mb-0 text-xs leading-tight dark:text-white dark:opacity-80 text-slate-400">{{ $shift->end_time }}</p>
                                         </td>
                                         <td class="p-2 text-center align-middle bg-transparent border-b dark:border-white/40 whitespace-nowrap shadow-transparent">
-                                            <a href="javascript:void(0);" class="btn btn-secondary text-xs border-0 shiftModalEditLink" 
+                                            <a href="javascript:void(0);" class="btn btn-secondary text-xs border-0 shiftModalEditLink"
                                                 data-shift-id="{{ $shift->id }}" data-bs-toggle="modal" data-bs-target="#shiftModalEdit">
                                                 <i class="fas fa-edit" aria-hidden="true"></i>
                                             </a>
@@ -44,7 +44,7 @@
                                             <a href="/schedules/shift/{{ $shift->id }}/delete" class="btn btn-danger text-xs border-0" data-confirm-delete="true">
                                                 <i class="fas fa-trash-alt" aria-hidden="true"></i>
                                             </a>
-                                        </td> 
+                                        </td>
                                     </tr>
                                     @endforeach
                                 </tbody>
@@ -84,7 +84,7 @@
                                 <option value="Minggu">Minggu</option>
                             </select>
                         </div>
-                        
+
                     </div>
                     <div class="flex-auto px-0 pt-0 pb-2">
                         <div class="p-0 overflow-x-auto">
@@ -94,6 +94,7 @@
                                         <th class="px-6 py-3 font-bold text-center uppercase align-middle bg-transparent border-b border-collapse shadow-none text-xxs border-b-solid tracking-none whitespace-nowrap">Nama Satpam</th>
                                         <th class="px-6 py-3 font-bold text-center uppercase align-middle bg-transparent border-b border-collapse shadow-none text-xxs border-b-solid tracking-none whitespace-nowrap">Hari</th>
                                         <th class="px-6 py-3 font-bold text-center uppercase align-middle bg-transparent border-b border-collapse shadow-none text-xxs border-b-solid tracking-none whitespace-nowrap">Shift</th>
+                                        <th class="px-6 py-3 font-bold text-center uppercase align-middle bg-transparent border-b border-collapse shadow-none text-xxs border-b-solid tracking-none whitespace-nowrap">Tanggal</th>
                                         <th class="px-6 py-3 font-semibold capitalize align-middle bg-transparent border-b border-collapse border-solid shadow-none dark:border-white/40 dark:text-white tracking-none whitespace-nowrap text-slate-400 opacity-70"></th>
                                     </tr>
                                 </thead>
@@ -104,10 +105,13 @@
                                             <p class="mb-0 text-xs leading-tight dark:text-white dark:opacity-80 text-slate-400">{{ $schedule->guardRelation->name }}</p>
                                         </td>
                                         <td class="p-2 text-center align-middle bg-transparent border-b dark:border-white/40 whitespace-nowrap shadow-transparent">
-                                            <p class="mb-0 text-xs leading-tight dark:text-white dark:opacity-80 text-slate-400">{{ $schedule->day }}</p>
+                                            <p class="mb-0 text-xs leading-tight dark:text-white dark:opacity-80 text-slate-400">{{ \Carbon\Carbon::parse($schedule->schedule_date)->translatedFormat('l') }}</p>
                                         </td>
                                         <td class="p-2 text-center align-middle bg-transparent border-b dark:border-white/40 whitespace-nowrap shadow-transparent">
                                             <p class="mb-0 text-xs leading-tight dark:text-white dark:opacity-80 text-slate-400">{{ $schedule->shift->start_time }} - {{ $schedule->shift->end_time }}</p>
+                                        </td>
+                                        <td class="p-2 text-center align-middle bg-transparent border-b dark:border-white/40 whitespace-nowrap shadow-transparent">
+                                            <p class="mb-0 text-xs leading-tight dark:text-white dark:opacity-80 text-slate-400">{{ $schedule->schedule_date }}</p>
                                         </td>
                                         <td class="p-2 text-center align-middle bg-transparent border-b dark:border-white/40 whitespace-nowrap shadow-transparent">
                                             <a href="/schedules/guard/{{ $schedule->id }}/edit" class="btn btn-secondary text-xs border-0">
@@ -117,7 +121,7 @@
                                             <a href="/schedules/guard/{{ $schedule->id }}/delete" class="btn btn-danger text-xs border-0" data-confirm-delete="true">
                                                 <i class="fas fa-trash-alt" aria-hidden="true"></i>
                                             </a>
-                                        </td> 
+                                        </td>
                                     </tr>
                                     @endforeach
                                 </tbody>

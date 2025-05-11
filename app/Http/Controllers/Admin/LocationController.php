@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Location;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
+use App\Models\TrackingLog;
 
 class LocationController extends Controller {
     /**
@@ -14,11 +15,13 @@ class LocationController extends Controller {
     public function index() {
         $title = 'Delete!';
         $text = "Are you sure you want to delete?";
+        $logs = TrackingLog::with(['guardRelation.schedules'])->get();
         confirmDelete($title, $text);
 
         return view('pages.location.location', [
             'title'=> 'Data Lokasi Patroli',
-            'locations' => Location::all()
+            'locations' => Location::all(),
+            'logs' => $logs
         ]);
     }
 
