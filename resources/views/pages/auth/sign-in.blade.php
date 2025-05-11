@@ -6,6 +6,18 @@
         background-image: linear-gradient(0deg,rgba(36, 44, 59, 1) 0%, rgba(55, 182, 233, 1) 100%);
         opacity: 1;
     }    
+    .transition-all {
+    transition-property: all;
+    transition-timing-function: cubic-bezier(0.25, 0.1, 0.25, 1);
+    transition-duration: 150ms;
+    background-color: #003366; /* Dark Blue */
+    }
+
+    .transition-all:focus {
+        outline: 2px solid #1E3A8A; /* Blue Outline when focused */
+        outline-offset: 2px; /* Slightly offset the outline for better visibility */
+    }
+
     </style>   
 <div class="container sticky top-0 z-sticky">
     <div class="flex flex-wrap -mx-3">
@@ -47,7 +59,7 @@
                                         @error('password')
                                             <div class="invalid-feedback text-red-500 text-sm mt-1">{{ $message }}</div>
                                         @enderror
-                                    </div>
+                                    </div>                                    
 
                                     <div class="text-center">
                                         <button type="submit"

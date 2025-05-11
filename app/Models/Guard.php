@@ -27,4 +27,8 @@ class Guard extends Model {
     public function reports() {
         return $this->hasMany(Report::class);
     }
+    public function trackingLogs()
+    {
+        return $this->hasMany(TrackingLog::class, 'guard_id');
+    }
 }

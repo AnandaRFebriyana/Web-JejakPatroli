@@ -13,7 +13,7 @@
                                 <div class="mb-4">
                                     <label for="guard_id"
                                         class="inline-block mb-2 ml-1 font-bold text-xs text-slate-700 dark:text-white/80">Nama Satpam</label>
-                                    <select id="guard_id" name="guard_id" 
+                                    <select id="guard_id" name="guard_id"
                                         class="form-control @error('guard_id') is-invalid @enderror focus:shadow-primary-outline dark:bg-slate-850 dark:text-white text-sm leading-5.6 ease block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding px-3 py-2 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:border-blue-500 focus:outline-none">
                                         <option value="" selected disabled>Pilih Nama</option>
                                         @foreach ($guards as $guard)
@@ -45,6 +45,18 @@
 
                             <div class="w-full max-w-full px-3 shrink-0 md:w-full md:flex-0">
                                 <div class="mb-4">
+                                    <label for="schedule_date"
+                                        class="inline-block mb-2 ml-1 font-bold text-xs text-slate-700 dark:text-white/80">Tanggal Jadwal</label>
+                                    <input type="date" id="schedule_date" name="schedule_date"
+                                        class="form-control @error('schedule_date') is-invalid @enderror focus:shadow-primary-outline dark:bg-slate-850 dark:text-white text-sm leading-5.6 ease block w-full rounded-lg border border-solid border-gray-300 bg-white px-3 py-2 text-gray-700 placeholder:text-gray-500 focus:border-blue-500 focus:outline-none">
+                                    @error('schedule_date')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+
+                            <div class="w-full max-w-full px-3 shrink-0 md:w-full md:flex-0">
+                                <div class="mb-4">
                                     <label for="day" class="inline-block mb-2 ml-1 font-bold text-xs text-slate-700 dark:text-white/80">Hari</label>
                                     <select id="day" name="day"
                                         class="form-control @error('day') is-invalid @enderror focus:shadow-primary-outline dark:bg-slate-850 dark:text-white text-sm leading-5.6 ease block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding px-3 py-2 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:border-blue-500 focus:outline-none">
@@ -59,17 +71,26 @@
                                 </div>
                             </div>
 
-                            <div class="w-full max-w-full px-3 shrink-0 md:w-full md:flex-0">
-                                <div class="mb-4">
-                                    <label for="schedule_date"
-                                        class="inline-block mb-2 ml-1 font-bold text-xs text-slate-700 dark:text-white/80">Tanggal Jadwal</label>
-                                    <input type="date" id="schedule_date" name="schedule_date"
-                                        class="form-control @error('schedule_date') is-invalid @enderror focus:shadow-primary-outline dark:bg-slate-850 dark:text-white text-sm leading-5.6 ease block w-full rounded-lg border border-solid border-gray-300 bg-white px-3 py-2 text-gray-700 placeholder:text-gray-500 focus:border-blue-500 focus:outline-none">
-                                    @error('schedule_date')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
+                            <script>
+                                document.addEventListener('DOMContentLoaded', function () {
+                                    const dateInput = document.getElementById('schedule_date');
+                                    const daySelect = document.getElementById('day');
+
+                                    const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+
+                                    dateInput.addEventListener('change', function () {
+                                        const selectedDate = new Date(this.value);
+                                        if (!isNaN(selectedDate)) {
+                                            const dayIndex = selectedDate.getDay(); // 0 (Minggu) sampai 6 (Sabtu)
+                                            const dayName = days[dayIndex];
+
+                                            // Set nilai dropdown otomatis
+                                            daySelect.value = dayName;
+                                        }
+                                    });
+                                });
+                            </script>
+
 
                             <div class="modal-footer">
                                 <button type="submit" class="inline-block px-8 py-2 mb-4 font-bold leading-normal text-center text-white align-middle transition-all ease-in bg-tosca border-0 rounded-lg shadow-md cursor-pointer text-xs tracking-tight-rem hover:shadow-xs hover:-translate-y-px active:opacity-85">Simpan</button>
