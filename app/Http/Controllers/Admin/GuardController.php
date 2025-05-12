@@ -14,8 +14,8 @@ class GuardController extends Controller {
      * Display a listing of the resource.
      */
     public function index() {
-        $title = 'Delete!';
-        $text = "Are you sure you want to delete?";
+        $title = 'Hapus!';
+        $text = "Apakah anda yakin ingin menghapusnya?";
         confirmDelete($title, $text);
 
         $guards = Guard::paginate(5);
@@ -32,6 +32,22 @@ class GuardController extends Controller {
     public function create() {
         return view('pages.guard.create', [
             'title' => 'Data Satpam'
+        ]);
+    }
+
+    public function getPhoto($id) {
+        $guard = Guard::find($id);
+
+        if (!$guard || !$guard->photo) {
+            return response()->json([
+                'error' => 'Data tidak ditemukan atau tidak memiliki foto.'
+            ], 404);
+        }
+
+        $photoUrl = url('storage/' . $guard->photo);
+
+        return response()->json([
+            'photo_url' => $photoUrl
         ]);
     }
 
@@ -97,17 +113,13 @@ class GuardController extends Controller {
     /**
      * Remove the specified resource from storage.
      */
-    // public function destroy(Guard $guard) {
-    //     Guard::destroy($guard->id);
-    //     // return redirect('/guard')->with('toast_success','Data has been deleted!');
-    //     return redirect('/guard')->with('success','Berhasil menghapus data!');
-    // }
+
     public function destroy($id) {
         $guard = Guard::find($id);
         $guard->delete();
         return back()->with('success', 'Berhasil mengahapus data!');
-    }
 
+    }
     public function getAccount($id) {
         $guard = Guard::find($id);
         return response()->json([
@@ -120,20 +132,20 @@ class GuardController extends Controller {
         $guard = Guard::find($id);
 
         $rules = [
-            'password' => 'required',
+            'password' => 'required|confirmed|min:6|regex:/^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]+$/',
         ];
-        if ($request->filled('password')) {
-            $rules['password'] = 'min:6|regex:/^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]+$/';
-        }
+
         $validatedData = $request->validate($rules, [
             'password.required' => 'Password harus di isi',
             'password.min' => 'Password harus memiliki minimal :min karakter.',
             'password.regex' => 'Password harus mengandung setidaknya satu angka dan satu simbol.',
+            'password.confirmed' => 'Konfirmasi password tidak cocok.',
         ]);
 
         if ($request->filled('password')) {
             $validatedData['password'] = Hash::make($validatedData['password']);
-            $guard->update($validatedData);
+            $guard->update(['password' => $validatedData['password']]);
+
             if ($request->ajax()) {
                 return response()->json(['success' => 'Berhasil mengubah password!']);
             }

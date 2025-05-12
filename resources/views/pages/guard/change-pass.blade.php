@@ -17,7 +17,8 @@
                             <label for="email"
                                 class="inline-block ml-1 font-bold text-xs text-slate-700 dark:text-white/80">Email</label>
                             <input type="text" name="email" id="email" value="{{ $guard->email ?? '' }}"
-                                class="focus:shadow-primary-outline dark:bg-slate-850 dark:text-white text-sm leading-5.6 ease block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding px-3 py-2 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:border-blue-500 focus:outline-none" />
+                                readonly
+                                class="focus:shadow-primary-outline dark:bg-slate-850 dark:text-white text-sm leading-5.6 ease block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-gray-100 bg-clip-padding px-3 py-2 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:border-blue-500 focus:outline-none" />
                         </div>
                     </div>
 
@@ -30,7 +31,17 @@
                             <div class="invalid-feedback text-red-500 mt-1"></div>
                         </div>
                     </div>
-                
+
+                    <div class="w-full max-w-full px-3 shrink-0 md:flex-0">
+                        <div class="mb-4 flex flex-col relative">
+                            <label for="password_confirmation"
+                                class="inline-block ml-1 font-bold text-xs text-slate-700 dark:text-white/80">Konfirmasi Password</label>
+                            <input type="password" name="password_confirmation" id="password_confirmation"
+                                class="form-control focus:shadow-primary-outline dark:bg-slate-850 dark:text-white text-sm leading-5.6 ease block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding px-3 py-2 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:border-blue-500 focus:outline-none" />
+                            <div class="invalid-feedback text-red-500 mt-1"></div>
+                        </div>
+                    </div>
+
                     <div class="modal-footer">
                         <button type="submit" class="inline-block px-8 py-2 mb-4 font-bold leading-normal text-center text-white align-middle transition-all ease-in bg-tosca border-0 rounded-lg shadow-md cursor-pointer text-xs tracking-tight-rem hover:shadow-xs hover:-translate-y-px active:opacity-85">Simpan</button>
                     </div>
@@ -39,3 +50,18 @@
         </div>
     </div>
 </div>
+
+<script>
+    const passModal = document.getElementById('passModalEdit');
+
+    passModal.addEventListener('hidden.bs.modal', function () {
+        const form = passModal.querySelector('form');
+        form.reset();
+
+        form.querySelector('#guard_id').value = '';
+
+        form.querySelectorAll('.invalid-feedback').forEach(el => {
+            el.textContent = '';
+        });
+    });
+</script>
