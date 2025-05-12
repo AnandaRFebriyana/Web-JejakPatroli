@@ -42,7 +42,7 @@
                                             </a>
                                             |
                                             <a href="/schedules/shift/{{ $shift->id }}/delete" class="btn btn-danger text-xs border-0" data-confirm-delete="true">
-                                                <i class="fas fa-trash-alt" aria-hidden="true"></i>
+                                                <i class="fas fa-trash-alt" aria-hidden="true" style="pointer-events: none;"></i>
                                             </a>
                                         </td>
                                     </tr>
@@ -119,7 +119,7 @@
                                             </a>
                                             |
                                             <a href="/schedules/guard/{{ $schedule->id }}/delete" class="btn btn-danger text-xs border-0" data-confirm-delete="true">
-                                                <i class="fas fa-trash-alt" aria-hidden="true"></i>
+                                                <i class="fas fa-trash-alt" aria-hidden="true" style="pointer-events: none;"></i>
                                             </a>
                                         </td>
                                     </tr>
