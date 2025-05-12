@@ -17,5 +17,9 @@ class Location extends Model {
     public function attandancesRelation() {
         return $this->hasMany(Guard::class, 'guard_id');
     }
+    public function guardRelation() {
+        return $this->belongsTo(Guard::class, 'guard_id');
+    }
+
 
 }

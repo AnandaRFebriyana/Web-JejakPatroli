@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\GuardController;
 use App\Http\Controllers\Admin\LocationController;
 use App\Http\Controllers\Admin\ScheduleController;
 use App\Http\Controllers\Admin\ReportController;
+
 use Illuminate\Support\Facades\Route;
 
 
@@ -20,17 +21,21 @@ Route::middleware('auth:admin')->group(function (){
 
     Route::resource('/guard', GuardController::class);
     Route::get('/guard/{id}/account', [GuardController::class, 'getAccount']);
+    Route::get('/guard-photo/{id}', [GuardController::class, 'getPhoto']);
     Route::put('/guard/update/{id}', [GuardController::class, 'updatePass']);
+    Route::put('/guard/{id}/delete', [GuardController::class, 'destroy']);
+
 
     Route::resource('/presence', AttendanceController::class);
     Route::post('/get-guard', [AttendanceController::class, 'getSatpam']);
 
-    Route::resource('/location', LocationController::class);
+    Route::resource('/location', LocationController::class)->only('index','show');
     Route::resource('/report', ReportController::class);
+
 
     Route::controller(ScheduleController::class)->group(function () {
         Route::get('/schedules', 'index');
-        
+
         Route::prefix('/schedules/guard')->group(function () {
             Route::get('/create', 'createGuard');
             Route::post('/store', 'storeGuard');
@@ -44,5 +49,7 @@ Route::middleware('auth:admin')->group(function (){
             Route::put('/{id}', 'updateShift');
             Route::delete('/{id}/delete', 'destroyShift');
         });
+
+
     });
 });

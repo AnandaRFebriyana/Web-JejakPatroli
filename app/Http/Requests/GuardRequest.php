@@ -21,9 +21,9 @@ class GuardRequest extends FormRequest {
         return [
             'name' => 'required',
             'birth_date' => 'required',
-            'photo' => 'image|mimes:jpeg,png,jpg|max:1024',
+            'photo' => 'image|mimes:jpeg,png,jpg|max:10240',
             'email' => 'required|email|unique:guards,email',
-            'password' => 'required|min:6|regex:/^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]+$/',
+            'password' => 'required|confirmed|min:6|regex:/^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]+$/',
             'phone_number' => 'required',
             'address' => 'required',
         ];
@@ -39,6 +39,7 @@ class GuardRequest extends FormRequest {
             'password.required' => 'Password harus diisi',
             'password.min' => 'Password harus memiliki minimal 6 karakter',
             'password.regex' => 'Password harus mengandung angka dan simbol (contoh simbol: !@#$%^&*)',
+            'password.confirmed' => 'Konfirmasi password tidak cocok',
             'phone_number.required' => 'Nomor Telepon harus diisi',
             'address.required' => 'Alamat harus diisi',
         ];
