@@ -8,11 +8,7 @@
       <div class="p-6 pb-0 mb-0 border-b-0 border-b-solid rounded-t-2xl border-b-transparent">
         <h6 class="dark:text-white">Tracking Patroli Satpam</h6>
         <h6 class="dark:text-white">Data Tracking</h6>
-        <div class="flex justify-end">
-            <button data-bs-toggle="modal" data-bs-target="#locModal"
-              class="inline-block px-8 py-2 mb-4 font-bold leading-normal text-center text-white align-middle transition-all ease-in bg-tosca border-0 rounded-lg shadow-md cursor-pointer text-xs tracking-tight-rem hover:shadow-xs hover:-translate-y-px active:opacity-85">Tambah</button>
-            @include('pages.location.create')
-        </div>
+        
         <div class="flex md:pr-4">
           <div class="relative flex flex-wrap items-stretch transition-all rounded-lg ease">
             <span class="text-sm ease leading-5.6 absolute z-50 -ml-px flex h-full items-center whitespace-nowrap rounded-lg rounded-tr-none rounded-br-none border border-r-0 border-transparent bg-transparent py-2 px-2.5 text-center font-normal text-slate-500 transition-all">

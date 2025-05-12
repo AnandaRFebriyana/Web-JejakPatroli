@@ -19,8 +19,10 @@ class GuardController extends Controller {
         confirmDelete($title, $text);
 
         $guards = Guard::paginate(5);
+
         return view('pages.guard.guard', compact('guards'), [
             'title' => 'Data Satpam'
+
         ]);
     }
 
@@ -39,7 +41,7 @@ class GuardController extends Controller {
     public function store(GuardRequest $request) {
         $validatedData = $request->validated();
         $validatedData['password'] = Hash::make($validatedData['password']);
-    
+
         if ($request->hasFile('photo')) {
             $validatedData['photo'] = $request->file('photo')->store('photo-profile', 'public');
         }
@@ -64,7 +66,7 @@ class GuardController extends Controller {
             'guard' => $guard
         ]);
     }
-    
+
     /**
      * Update the specified resource in storage.
      */
@@ -77,7 +79,7 @@ class GuardController extends Controller {
             'address' => 'required',
         ];
         $validatedData = $request->validate($rules);
-        
+
         if ($request->file('photo')) {
             if ($guard->photo) {
                 Storage::delete($guard->photo);
@@ -85,7 +87,7 @@ class GuardController extends Controller {
             $validatedData['photo'] = $request->file('photo')->store('photo-profile', 'public');
         }
         $guard->update($validatedData);
-    
+
         // session()->flash('toast_message', 'Data has been updated!');
         // return redirect('/guard');
         // return redirect('/guard')->with('toast_success','Data has been updated!');
@@ -95,10 +97,15 @@ class GuardController extends Controller {
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Guard $guard) {
-        Guard::destroy($guard->id);
-        // return redirect('/guard')->with('toast_success','Data has been deleted!');
-        return redirect('/guard')->with('success','Berhasil menghapus data!');
+    // public function destroy(Guard $guard) {
+    //     Guard::destroy($guard->id);
+    //     // return redirect('/guard')->with('toast_success','Data has been deleted!');
+    //     return redirect('/guard')->with('success','Berhasil menghapus data!');
+    // }
+    public function destroy($id) {
+        $guard = Guard::find($id);
+        $guard->delete();
+        return back()->with('success', 'Berhasil mengahapus data!');
     }
 
     public function getAccount($id) {
@@ -111,7 +118,7 @@ class GuardController extends Controller {
 
     public function updatePass(Request $request, $id) {
         $guard = Guard::find($id);
-    
+
         $rules = [
             'password' => 'required',
         ];
@@ -123,7 +130,7 @@ class GuardController extends Controller {
             'password.min' => 'Password harus memiliki minimal :min karakter.',
             'password.regex' => 'Password harus mengandung setidaknya satu angka dan satu simbol.',
         ]);
-    
+
         if ($request->filled('password')) {
             $validatedData['password'] = Hash::make($validatedData['password']);
             $guard->update($validatedData);
@@ -135,7 +142,7 @@ class GuardController extends Controller {
             return redirect('/guard')->with('error', 'Password tidak diisi!');
         }
     }
-    
-    
+
+
 
 }

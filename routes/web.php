@@ -22,6 +22,9 @@ Route::middleware('auth:admin')->group(function (){
     Route::resource('/guard', GuardController::class);
     Route::get('/guard/{id}/account', [GuardController::class, 'getAccount']);
     Route::put('/guard/update/{id}', [GuardController::class, 'updatePass']);
+    Route::put('/guard/{id}/delete', [GuardController::class, 'destroy']);
+
+
 
     Route::resource('/presence', AttendanceController::class);
     Route::post('/get-guard', [AttendanceController::class, 'getSatpam']);
