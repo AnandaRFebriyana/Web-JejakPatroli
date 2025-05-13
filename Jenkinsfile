@@ -45,9 +45,12 @@ pipeline {
                 }
 
                 // Gunakan Docker untuk menjalankan rsync dan SSH
-                docker.image('jenkins/jenkins:lts').inside('-u root') {
+                docker.image('agung3wi/alpine-rsync:1.1').inside('-u root') {
+                    // Setup SSH untuk menghindari masalah 'host verification'
                     sh 'mkdir -p ~/.ssh'
                     sh 'ssh-keyscan -H "$PROD_HOST" > ~/.ssh/known_hosts'
+                    
+                    // Salin project ke server produksi menggunakan rsync
                     sh """
                     rsync -rav --delete ./laravel/ ubuntu@$PROD_HOST:/home/ubuntu/prod.kelasdevops.xyz/ \
                     --exclude=.env --exclude=storage --exclude=.git
