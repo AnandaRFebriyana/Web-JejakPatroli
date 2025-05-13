@@ -1,69 +1,48 @@
 pipeline {
-  agent none
-
+  agent any
   environment {
     AUTHOR = "Muhammad Rofiqi"
     PROJECT = "Web-JejakPatroli"
     REPO_URL = "https://github.com/AnandaRFebriyana/Web-JejakPatroli"
   }
-
   options {
     disableConcurrentBuilds()
     timeout(time: 15, unit: 'MINUTES')
   }
-
   stages {
     stage("Preparation") {
-      agent {
-        node {
-          label "ubuntu"
-        }
-      }
       steps {
         echo("Preparing build environment for ${PROJECT}")
         echo("Repository URL: ${REPO_URL}")
       }
     }
-
     stage("Build") {
-      agent {
-        node {
-          label "ubuntu"
-        }
-      }
       steps {
         echo("Start Build")
-        
+
         // Gunakan script untuk menjalankan perintah dalam Docker tanpa memerlukan agent Docker
         script {
           sh """
             docker run --rm -v "\${WORKSPACE}:/app" -w /app node:14-alpine /bin/sh -c "npm install && npm run build"
           """
         }
-        
+
         echo("Finish Build")
       }
     }
-
     stage("Test") {
-      agent {
-        node {
-          label "ubuntu"
-        }
-      }
       steps {
         echo("Start Test")
-        
+
         script {
           sh """
             docker run --rm -v "\${WORKSPACE}:/app" -w /app node:14-alpine /bin/sh -c "npm test || true"
           """
         }
-        
+
         echo("Finish Test")
       }
     }
-
     stage("Deploy") {
       input {
         message "Can we deploy Web-JejakPatroli?"
@@ -73,14 +52,9 @@ pipeline {
           choice(name: "TARGET_ENV", choices: ['DEV', 'STAGING', 'PRODUCTION'], description: "Which Environment?")
         }
       }
-      agent {
-        node {
-          label "ubuntu"
-        }
-      }
       steps {
         echo("Deploying ${PROJECT} to ${TARGET_ENV}")
-        
+
         script {
           if (TARGET_ENV == 'PRODUCTION') {
             echo("Deploying to PRODUCTION environment")
@@ -96,7 +70,6 @@ pipeline {
       }
     }
   }
-
   post {
     always {
       echo "Pipeline for ${PROJECT} has completed"
