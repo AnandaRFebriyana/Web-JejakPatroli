@@ -1,155 +1,104 @@
 pipeline {
-  agent {
-    docker {
-      image 'php:8.1-cli'
-      args '-v $HOME/.composer:/root/.composer'
+    agent any
+    
+    environment {
+        PROJECT_NAME = "Web-JejakPatroli"
+        REPO_URL = "https://github.com/AnandaRFebriyana/Web-JejakPatroli"
     }
-  }
-  environment {
-    AUTHOR = "Muhammad Rofiqi"
-    PROJECT = "Web-JejakPatroli"
-    REPO_URL = "https://github.com/AnandaRFebriyana/Web-JejakPatroli"
-    DEPLOY_DIR = "/var/www/jejakpatroli"
-    DEPLOY_USER = "www-data"
-    DEPLOY_GROUP = "www-data"
-  }
-  options {
-    disableConcurrentBuilds()
-    timeout(time: 15, unit: 'MINUTES')
-  }
-  stages {
-    stage("Preparation") {
-      steps {
-        echo("Preparing build environment for ${PROJECT}")
-        echo("Repository URL: ${REPO_URL}")
-        
-        // Install dependencies for PHP
-        sh 'apt-get update && apt-get install -y git unzip libzip-dev libpng-dev'
-        sh 'docker-php-ext-install zip gd pdo pdo_mysql'
-        
-        // Install Composer
-        sh 'curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer'
-      }
-    }
-    stage("Build") {
-      steps {
-        echo("Start Build")
-        sh "composer install --no-dev --optimize-autoloader"
-        sh "php artisan config:cache"
-        sh "php artisan route:cache"
-        echo("Finish Build")
-      }
-    }
-    stage("Test") {
-      steps {
-        echo("Start Test")
-        sh "php artisan test || true"
-        echo("Finish Test")
-      }
-    }
-    stage("Deploy") {
-      agent {
-        label 'master'  // Use Jenkins master for deployment
-      }
-      input {
-        message "Can we deploy Web-JejakPatroli?"
-        ok "Yes, deploy it"
-        submitter "admin"
-        parameters {
-          choice(name: "TARGET_ENV", choices: ['DEV', 'STAGING', 'PRODUCTION'], description: "Which Environment?")
+    
+    stages {
+        stage("Verify tooling") {
+            steps {
+                sh '''
+                    docker info
+                    docker version
+                    docker compose version
+                '''
+            }
         }
-      }
-      steps {
-        echo("Deploying ${PROJECT} to ${TARGET_ENV}")
         
-        script {
-          def deployDir = ""
-          def envFile = ""
-          
-          if (TARGET_ENV == 'PRODUCTION') {
-            deployDir = "${DEPLOY_DIR}/production"
-            envFile = ".env.production"
-          } else if (TARGET_ENV == 'STAGING') {
-            deployDir = "${DEPLOY_DIR}/staging"
-            envFile = ".env.staging"
-          } else {
-            deployDir = "${DEPLOY_DIR}/development"
-            envFile = ".env.dev"
-          }
-          
-          // Create deployment directory
-          sh "mkdir -p ${deployDir}"
-          
-          // Copy workspace content to deployment directory
-          sh "cp -R ${WORKSPACE}/* ${deployDir}/"
-          
-          // Laravel deployment steps
-          dir("${deployDir}") {
-            // Copy environment file
-            sh "cp ${envFile} .env || echo 'Warning: No ${envFile} found'"
-            
-            // Install PHP dependencies
-            sh "composer install --no-interaction --no-progress --optimize-autoloader"
-            
-            if (TARGET_ENV != 'PRODUCTION') {
-              sh "composer install --no-interaction --no-progress"
-            } else {
-              sh "composer install --no-interaction --no-progress --no-dev --optimize-autoloader"
+        stage("Verify SSH connection to server") {
+            steps {
+                sshagent(credentials: ['deploy-key']) {
+                    sh '''
+                        ssh -o StrictHostKeyChecking=no ubuntu@your-server-ip whoami
+                    '''
+                }
             }
-            
-            // Generate application key if needed
-            sh "php artisan key:generate --force"
-            
-            // Run migrations
-            sh "php artisan migrate --force"
-            
-            // Clear or cache based on environment
-            if (TARGET_ENV == 'PRODUCTION' || TARGET_ENV == 'STAGING') {
-              sh "php artisan config:cache"
-              sh "php artisan route:cache"
-              sh "php artisan view:cache"
-            } else {
-              sh "php artisan config:clear"
-              sh "php artisan route:clear"
-              sh "php artisan view:clear"
-              sh "php artisan cache:clear"
-            }
-            
-            // Set correct permissions
-            sh "chown -R ${DEPLOY_USER}:${DEPLOY_GROUP} ."
-            sh "chmod -R 755 ."
-            sh "chmod -R 775 storage bootstrap/cache"
-            
-            // Create appropriate symlink
-            if (TARGET_ENV == 'PRODUCTION') {
-              sh "ln -sfn ${deployDir} ${DEPLOY_DIR}/current"
-            } else if (TARGET_ENV == 'STAGING') {
-              sh "ln -sfn ${deployDir} ${DEPLOY_DIR}/staging-current"
-            } else {
-              sh "ln -sfn ${deployDir} ${DEPLOY_DIR}/dev-current"
-            }
-            
-            // Reload services (without sudo as we're on master)
-            sh "systemctl reload nginx || echo 'Failed to reload nginx'"
-            sh "systemctl reload php-fpm || echo 'Failed to reload php-fpm'"
-          }
         }
-      }
+        
+        stage("Clear all running docker containers") {
+            steps {
+                script {
+                    try {
+                        sh 'docker rm -f $(docker ps -a -q)'
+                    } catch (Exception e) {
+                        echo 'No running container to clear up...'
+                    }
+                }
+            }
+        }
+        
+        stage("Start Docker") {
+            steps {
+                sh 'docker compose up -d'
+                sh 'docker compose ps'
+            }
+        }
+        
+        stage("Install Dependencies") {
+            steps {
+                sh 'docker compose run --rm node npm install'
+            }
+        }
+        
+        stage("Build Application") {
+            steps {
+                sh 'docker compose run --rm node npm run build'
+            }
+        }
+        
+        stage("Run Tests") {
+            steps {
+                script {
+                    try {
+                        sh 'docker compose run --rm node npm test'
+                    } catch (Exception e) {
+                        echo 'Tests failed, but continuing the pipeline...'
+                    }
+                }
+            }
+        }
     }
-  }
-  post {
-    always {
-      echo "Pipeline for ${PROJECT} has completed"
+    
+    post {
+        success {
+            script {
+                // Create deployment artifact
+                sh 'cd "${WORKSPACE}"'
+                sh 'rm -rf artifact.zip'
+                sh 'zip -r artifact.zip . -x "*node_modules**" -x "*.git*"'
+                
+                // Deploy to server
+                withCredentials([sshUserPrivateKey(credentialsId: "deploy-key", keyFileVariable: 'keyfile')]) {
+                    sh 'scp -v -o StrictHostKeyChecking=no -i ${keyfile} ${WORKSPACE}/artifact.zip ubuntu@your-server-ip:/home/ubuntu/deployments/${PROJECT_NAME}'
+                }
+                
+                sshagent(credentials: ['deploy-key']) {
+                    // Unzip and deploy
+                    sh '''
+                        ssh -o StrictHostKeyChecking=no  -p 33333 root@141.11.190.114 "mkdir -p /home/ubuntu/deployments/${PROJECT_NAME}"
+                        ssh -o StrictHostKeyChecking=no  -p 33333 root@141.11.190.114 "unzip -o /home/ubuntu/deployments/${PROJECT_NAME}/artifact.zip -d /home/ubuntu/deployments/${PROJECT_NAME}/app"
+                        ssh -o StrictHostKeyChecking=no  -p 33333 root@141.11.190.114 "cd /home/ubuntu/deployments/${PROJECT_NAME}/app && npm install --production"
+                        ssh -o StrictHostKeyChecking=no  -p 33333 root@141.11.190.114p "cd /home/ubuntu/deployments/${PROJECT_NAME}/app && pm2 restart ecosystem.config.js || pm2 start ecosystem.config.js"
+                    '''
+                }
+            }
+        }
+        
+        always {
+            sh 'docker compose down --remove-orphans -v'
+            sh 'docker compose ps'
+        }
     }
-    success {
-      echo "Pipeline for ${PROJECT} completed successfully"
-    }
-    failure {
-      echo "Pipeline for ${PROJECT} failed"
-    }
-    cleanup {
-      echo "Cleaning up workspace"
-      cleanWs()
-    }
-  }
 }
