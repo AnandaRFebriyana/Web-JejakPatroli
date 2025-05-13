@@ -1,5 +1,10 @@
 pipeline {
-  agent any
+  agent {
+    docker {
+      image 'node:14-alpine'
+      args '-v $HOME/.npm:/root/.npm'
+    }
+  }
   environment {
     AUTHOR = "Muhammad Rofiqi"
     PROJECT = "Web-JejakPatroli"
@@ -19,31 +24,19 @@ pipeline {
     stage("Build") {
       steps {
         echo("Start Build")
-
-        // Gunakan script untuk menjalankan perintah dalam Docker tanpa memerlukan agent Docker
-        script {
-          sh """
-            docker run --rm -v "\${WORKSPACE}:/app" -w /app node:14-alpine /bin/sh -c "npm install && npm run build"
-          """
-        }
-
+        sh "npm install && npm run build"
         echo("Finish Build")
       }
     }
     stage("Test") {
       steps {
         echo("Start Test")
-
-        script {
-          sh """
-            docker run --rm -v "\${WORKSPACE}:/app" -w /app node:14-alpine /bin/sh -c "npm test || true"
-          """
-        }
-
+        sh "npm test || true"
         echo("Finish Test")
       }
     }
     stage("Deploy") {
+      agent any  // Kembali ke agent default untuk deployment
       input {
         message "Can we deploy Web-JejakPatroli?"
         ok "Yes, deploy it"
@@ -54,7 +47,7 @@ pipeline {
       }
       steps {
         echo("Deploying ${PROJECT} to ${TARGET_ENV}")
-
+        
         script {
           if (TARGET_ENV == 'PRODUCTION') {
             echo("Deploying to PRODUCTION environment")
