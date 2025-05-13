@@ -1,8 +1,8 @@
 pipeline {
   agent {
     docker {
-      image 'node:14-alpine'
-      args '-v $HOME/.npm:/root/.npm'
+      image 'php:8.1-cli'
+      args '-v $HOME/.composer:/root/.composer'
     }
   }
   environment {
@@ -22,24 +22,35 @@ pipeline {
       steps {
         echo("Preparing build environment for ${PROJECT}")
         echo("Repository URL: ${REPO_URL}")
+        
+        // Install dependencies for PHP
+        sh 'apt-get update && apt-get install -y git unzip libzip-dev libpng-dev'
+        sh 'docker-php-ext-install zip gd pdo pdo_mysql'
+        
+        // Install Composer
+        sh 'curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer'
       }
     }
     stage("Build") {
       steps {
         echo("Start Build")
-        sh "npm install && npm run build"
+        sh "composer install --no-dev --optimize-autoloader"
+        sh "php artisan config:cache"
+        sh "php artisan route:cache"
         echo("Finish Build")
       }
     }
     stage("Test") {
       steps {
         echo("Start Test")
-        sh "npm test || true"
+        sh "php artisan test || true"
         echo("Finish Test")
       }
     }
     stage("Deploy") {
-      agent any  // Kembali ke agent default untuk deployment
+      agent {
+        label 'master'  // Use Jenkins master for deployment
+      }
       input {
         message "Can we deploy Web-JejakPatroli?"
         ok "Yes, deploy it"
@@ -52,126 +63,75 @@ pipeline {
         echo("Deploying ${PROJECT} to ${TARGET_ENV}")
         
         script {
+          def deployDir = ""
+          def envFile = ""
+          
           if (TARGET_ENV == 'PRODUCTION') {
-            echo("Deploying to PRODUCTION environment")
-            
-            // Buat direktori deployment jika belum ada
-            sh "sudo mkdir -p ${DEPLOY_DIR}/production"
-            
-            // Salin konten workspace ke direktori deployment
-            sh "sudo cp -R ${WORKSPACE}/* ${DEPLOY_DIR}/production/"
-            
-            // Jalankan perintah untuk Laravel
-            dir("${DEPLOY_DIR}/production") {
-              // Install PHP dependencies dengan Composer
-              sh "sudo composer install --no-dev --optimize-autoloader"
-              
-              // Generate application key jika belum ada
-              sh "sudo php artisan key:generate --force"
-              
-              // Migrasi database
-              sh "sudo php artisan migrate --force"
-              
-              // Clear cache dan optimize
-              sh "sudo php artisan config:cache"
-              sh "sudo php artisan route:cache"
-              sh "sudo php artisan view:cache"
-              
-              // Set permission
-              sh "sudo chown -R ${DEPLOY_USER}:${DEPLOY_GROUP} ."
-              sh "sudo chmod -R 755 ."
-              sh "sudo chmod -R 775 storage bootstrap/cache"
-            }
-            
-            // Perbarui symlink jika diperlukan
-            sh "sudo ln -sfn ${DEPLOY_DIR}/production ${DEPLOY_DIR}/current"
-            
-            // Restart web server
-            sh "sudo systemctl restart nginx"
-            sh "sudo systemctl restart php-fpm"
-            
+            deployDir = "${DEPLOY_DIR}/production"
+            envFile = ".env.production"
           } else if (TARGET_ENV == 'STAGING') {
-            echo("Deploying to STAGING environment")
-            
-            // Buat direktori deployment jika belum ada
-            sh "sudo mkdir -p ${DEPLOY_DIR}/staging"
-            
-            // Salin konten workspace ke direktori deployment
-            sh "sudo cp -R ${WORKSPACE}/* ${DEPLOY_DIR}/staging/"
-            
-            // Jalankan perintah untuk Laravel
-            dir("${DEPLOY_DIR}/staging") {
-              // Copy .env file dari template
-              sh "sudo cp .env.staging .env"
-              
-              // Install PHP dependencies dengan Composer
-              sh "sudo composer install --optimize-autoloader"
-              
-              // Generate application key jika belum ada
-              sh "sudo php artisan key:generate --force"
-              
-              // Migrasi database
-              sh "sudo php artisan migrate --force"
-              
-              // Clear cache dan optimize
-              sh "sudo php artisan config:cache"
-              sh "sudo php artisan route:cache"
-              sh "sudo php artisan view:cache"
-              
-              // Set permission
-              sh "sudo chown -R ${DEPLOY_USER}:${DEPLOY_GROUP} ."
-              sh "sudo chmod -R 755 ."
-              sh "sudo chmod -R 775 storage bootstrap/cache"
-            }
-            
-            // Perbarui symlink
-            sh "sudo ln -sfn ${DEPLOY_DIR}/staging ${DEPLOY_DIR}/staging-current"
-            
-            // Restart web server
-            sh "sudo systemctl restart nginx"
-            sh "sudo systemctl restart php-fpm"
-            
+            deployDir = "${DEPLOY_DIR}/staging"
+            envFile = ".env.staging"
           } else {
-            echo("Deploying to DEV environment")
+            deployDir = "${DEPLOY_DIR}/development"
+            envFile = ".env.dev"
+          }
+          
+          // Create deployment directory
+          sh "mkdir -p ${deployDir}"
+          
+          // Copy workspace content to deployment directory
+          sh "cp -R ${WORKSPACE}/* ${deployDir}/"
+          
+          // Laravel deployment steps
+          dir("${deployDir}") {
+            // Copy environment file
+            sh "cp ${envFile} .env || echo 'Warning: No ${envFile} found'"
             
-            // Buat direktori deployment jika belum ada
-            sh "sudo mkdir -p ${DEPLOY_DIR}/development"
+            // Install PHP dependencies
+            sh "composer install --no-interaction --no-progress --optimize-autoloader"
             
-            // Salin konten workspace ke direktori deployment
-            sh "sudo cp -R ${WORKSPACE}/* ${DEPLOY_DIR}/development/"
-            
-            // Jalankan perintah untuk Laravel
-            dir("${DEPLOY_DIR}/development") {
-              // Copy .env file dari template
-              sh "sudo cp .env.dev .env"
-              
-              // Install PHP dependencies dengan Composer
-              sh "sudo composer install"
-              
-              // Generate application key jika belum ada
-              sh "sudo php artisan key:generate --force"
-              
-              // Migrasi database
-              sh "sudo php artisan migrate"
-              
-              // Clear cache
-              sh "sudo php artisan config:clear"
-              sh "sudo php artisan route:clear"
-              sh "sudo php artisan view:clear"
-              sh "sudo php artisan cache:clear"
-              
-              // Set permission
-              sh "sudo chown -R ${DEPLOY_USER}:${DEPLOY_GROUP} ."
-              sh "sudo chmod -R 755 ."
-              sh "sudo chmod -R 775 storage bootstrap/cache"
+            if (TARGET_ENV != 'PRODUCTION') {
+              sh "composer install --no-interaction --no-progress"
+            } else {
+              sh "composer install --no-interaction --no-progress --no-dev --optimize-autoloader"
             }
             
-            // Perbarui symlink
-            sh "sudo ln -sfn ${DEPLOY_DIR}/development ${DEPLOY_DIR}/dev-current"
+            // Generate application key if needed
+            sh "php artisan key:generate --force"
             
-            // Restart web server
-            sh "sudo systemctl restart nginx"
-            sh "sudo systemctl restart php-fpm"
+            // Run migrations
+            sh "php artisan migrate --force"
+            
+            // Clear or cache based on environment
+            if (TARGET_ENV == 'PRODUCTION' || TARGET_ENV == 'STAGING') {
+              sh "php artisan config:cache"
+              sh "php artisan route:cache"
+              sh "php artisan view:cache"
+            } else {
+              sh "php artisan config:clear"
+              sh "php artisan route:clear"
+              sh "php artisan view:clear"
+              sh "php artisan cache:clear"
+            }
+            
+            // Set correct permissions
+            sh "chown -R ${DEPLOY_USER}:${DEPLOY_GROUP} ."
+            sh "chmod -R 755 ."
+            sh "chmod -R 775 storage bootstrap/cache"
+            
+            // Create appropriate symlink
+            if (TARGET_ENV == 'PRODUCTION') {
+              sh "ln -sfn ${deployDir} ${DEPLOY_DIR}/current"
+            } else if (TARGET_ENV == 'STAGING') {
+              sh "ln -sfn ${deployDir} ${DEPLOY_DIR}/staging-current"
+            } else {
+              sh "ln -sfn ${deployDir} ${DEPLOY_DIR}/dev-current"
+            }
+            
+            // Reload services (without sudo as we're on master)
+            sh "systemctl reload nginx || echo 'Failed to reload nginx'"
+            sh "systemctl reload php-fpm || echo 'Failed to reload php-fpm'"
           }
         }
       }
@@ -183,21 +143,13 @@ pipeline {
     }
     success {
       echo "Pipeline for ${PROJECT} completed successfully"
-      
-      // Kirim notifikasi sukses jika diperlukan
-      // mail to: "team@example.com", subject: "${PROJECT} - Build Succeeded", body: "Build completed successfully"
     }
     failure {
       echo "Pipeline for ${PROJECT} failed"
-      
-      // Kirim notifikasi gagal
-      // mail to: "team@example.com", subject: "${PROJECT} - Build Failed", body: "Build failed, please check Jenkins logs"
     }
     cleanup {
       echo "Cleaning up workspace"
-      
-      // Bersihkan workspace jika diperlukan
-      // cleanWs()
+      cleanWs()
     }
   }
 }
