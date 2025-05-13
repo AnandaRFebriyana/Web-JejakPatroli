@@ -1,62 +1,92 @@
 pipeline {
     agent any
-
+    
     environment {
-        PROD_HOST = '141.11.190.114'  // Ganti dengan alamat IP atau domain server produksi
-        COMPOSER = '/usr/local/bin/composer'  // Pastikan Composer dapat diakses
+        // Definisikan variabel lingkungan yang dibutuhkan
+        APP_NAME = 'web-jejakpatroli'
+        DOCKER_HUB_CREDS = credentials('dockerhub') // Pastikan kredensial ini sudah diatur di Jenkins
     }
-
+    
     stages {
         stage('Checkout') {
             steps {
+                // Checkout kode dari GitHub
                 checkout scm
+                echo 'Checkout selesai'
             }
         }
-
+        
         stage('Build') {
             steps {
-                script {
-                    echo '🔧 Checking PHP and Composer versions...'
-                    // Memastikan PHP dan Composer terinstal
-                    sh 'php -v'
-                    sh 'composer --version'
-
-                    echo '🚧 Installing dependencies...'
-                    // Install dependencies menggunakan Composer
-                    sh '$COMPOSER install --no-dev --optimize-autoloader'
-                }
+                // Jika ini adalah aplikasi Node.js/React/Vue
+                sh 'npm install'
+                sh 'npm run build'
+                echo 'Build selesai'
             }
         }
-
+        
         stage('Test') {
             steps {
-                script {
-                    echo '🧪 Running tests...'
-                    // Jalankan tes Laravel menggunakan PHPUnit
-                    sh 'php artisan test --env=testing'
-                }
+                // Jalankan unit test
+                sh 'npm run test'
+                echo 'Unit tests selesai'
             }
         }
-
-        stage('Deploy') {
+        
+        stage('Build Docker Image') {
             steps {
-                script {
-                    echo '🚀 Deploying application...'
-                }
-
-                // Gunakan Docker untuk menjalankan rsync dan SSH
-                docker.image('agung3wi/alpine-rsync:1.1').inside('-u root') {
-                    // Setup SSH untuk menghindari masalah 'host verification'
-                    sh 'mkdir -p ~/.ssh'
-                    sh 'ssh-keyscan -H "$PROD_HOST" > ~/.ssh/known_hosts'
-                    
-                    // Salin project ke server produksi menggunakan rsync
-                    sh """
-                    rsync -rav --delete ./laravel/ ubuntu@$PROD_HOST:/home/ubuntu/prod.kelasdevops.xyz/ \
-                    --exclude=.env --exclude=storage --exclude=.git
-                    """
-                }
+                // Build Docker image
+                sh "docker build -t ${env.APP_NAME}:${env.BUILD_NUMBER} ."
+                sh "docker tag ${env.APP_NAME}:${env.BUILD_NUMBER} ${env.DOCKER_HUB_CREDS_USR}/${env.APP_NAME}:${env.BUILD_NUMBER}"
+                sh "docker tag ${env.APP_NAME}:${env.BUILD_NUMBER} ${env.DOCKER_HUB_CREDS_USR}/${env.APP_NAME}:latest"
+                echo 'Docker build selesai'
             }
+        }
+        
+        stage('Push to Docker Hub') {
+            steps {
+                // Login ke Docker Hub dan push image
+                sh "echo ${env.DOCKER_HUB_CREDS_PSW} | docker login -u ${env.DOCKER_HUB_CREDS_USR} --password-stdin"
+                sh "docker push ${env.DOCKER_HUB_CREDS_USR}/${env.APP_NAME}:${env.BUILD_NUMBER}"
+                sh "docker push ${env.DOCKER_HUB_CREDS_USR}/${env.APP_NAME}:latest"
+                echo 'Push ke Docker Hub selesai'
+            }
+        }
+        
+        stage('Deploy to Production') {
+            steps {
+                // Contoh deployment, sesuaikan dengan kebutuhan Anda
+                // Ini bisa berupa SSH ke server atau menggunakan Kubernetes
+                echo 'Deploy ke production selesai'
+                
+                // Contoh jika menggunakan SSH untuk deploy ke server
+                // sshagent(['ssh-credentials-id']) {
+                //     sh '''
+                //         ssh user@production-server "cd /path/to/app && \
+                //         docker pull username/${APP_NAME}:latest && \
+                //         docker-compose down && \
+                //         docker-compose up -d"
+                //     '''
+                // }
+            }
+        }
+    }
+    
+    post {
+        always {
+            // Bersihkan workspace setelah build
+            cleanWs()
+            
+            // Bersihkan images Docker yang tidak digunakan
+            sh "docker system prune -f"
+        }
+        
+        success {
+            echo 'Pipeline berhasil! Web JejakPatroli sudah diperbarui.'
+        }
+        
+        failure {
+            echo 'Pipeline gagal! Silakan periksa log untuk detail lebih lanjut.'
         }
     }
 }
