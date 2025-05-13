@@ -1,6 +1,10 @@
 pipeline {
     agent any
     
+    tools {
+        nodejs 'NodeJS' // Pastikan Anda telah mengkonfigurasi NodeJS di Jenkins Global Tool Configuration
+    }
+    
     stages {
         stage('Build') {
             steps {
