@@ -4,7 +4,7 @@ pipeline {
     environment {
         // Definisikan variabel lingkungan yang dibutuhkan
         APP_NAME = 'web-jejakpatroli'
-        DOCKER_HUB_CREDS = credentials('dockerhub') // Pastikan kredensial ini sudah diatur di Jenkins
+        // Perhatikan: kredensial akan didefinisikan di stage yang diperlukan
     }
     
     stages {
@@ -37,8 +37,10 @@ pipeline {
             steps {
                 // Build Docker image
                 sh "docker build -t ${env.APP_NAME}:${env.BUILD_NUMBER} ."
-                sh "docker tag ${env.APP_NAME}:${env.BUILD_NUMBER} ${env.DOCKER_HUB_CREDS_USR}/${env.APP_NAME}:${env.BUILD_NUMBER}"
-                sh "docker tag ${env.APP_NAME}:${env.BUILD_NUMBER} ${env.DOCKER_HUB_CREDS_USR}/${env.APP_NAME}:latest"
+                withCredentials([usernamePassword(credentialsId: 'dockerhub', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
+                    sh "docker tag ${env.APP_NAME}:${env.BUILD_NUMBER} ${DOCKER_USERNAME}/${env.APP_NAME}:${env.BUILD_NUMBER}"
+                    sh "docker tag ${env.APP_NAME}:${env.BUILD_NUMBER} ${DOCKER_USERNAME}/${env.APP_NAME}:latest"
+                }
                 echo 'Docker build selesai'
             }
         }
@@ -46,9 +48,11 @@ pipeline {
         stage('Push to Docker Hub') {
             steps {
                 // Login ke Docker Hub dan push image
-                sh "echo ${env.DOCKER_HUB_CREDS_PSW} | docker login -u ${env.DOCKER_HUB_CREDS_USR} --password-stdin"
-                sh "docker push ${env.DOCKER_HUB_CREDS_USR}/${env.APP_NAME}:${env.BUILD_NUMBER}"
-                sh "docker push ${env.DOCKER_HUB_CREDS_USR}/${env.APP_NAME}:latest"
+                withCredentials([usernamePassword(credentialsId: 'dockerhub', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
+                    sh "echo ${DOCKER_PASSWORD} | docker login -u ${DOCKER_USERNAME} --password-stdin"
+                    sh "docker push ${DOCKER_USERNAME}/${env.APP_NAME}:${env.BUILD_NUMBER}"
+                    sh "docker push ${DOCKER_USERNAME}/${env.APP_NAME}:latest"
+                }
                 echo 'Push ke Docker Hub selesai'
             }
         }
@@ -74,11 +78,14 @@ pipeline {
     
     post {
         always {
-            // Bersihkan workspace setelah build
-            cleanWs()
-            
-            // Bersihkan images Docker yang tidak digunakan
-            sh "docker system prune -f"
+            node(null) {
+                // Bersihkan workspace setelah build
+                cleanWs()
+                
+                // Bersihkan images Docker yang tidak digunakan
+                sh "docker system prune -f || true"
+            }
+            echo 'Post-build cleanup selesai'
         }
         
         success {
