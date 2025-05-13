@@ -1,5 +1,5 @@
 pipeline {
-  agent none
+  agent any
 
   environment {
     AUTHOR = "Muhammad Rofiqi"
@@ -14,11 +14,6 @@ pipeline {
 
   stages {
     stage("Preparation") {
-      agent {
-        node {
-          label "linux"
-        }
-      }
       steps {
         echo("Preparing build environment for ${PROJECT}")
         echo("Repository URL: ${REPO_URL}")
@@ -26,11 +21,6 @@ pipeline {
     }
 
     stage("Build") {
-      agent {
-        node {
-          label "linux"
-        }
-      }
       steps {
         echo("Start Build")
         
@@ -46,11 +36,6 @@ pipeline {
     }
 
     stage("Test") {
-      agent {
-        node {
-          label "linux"
-        }
-      }
       steps {
         echo("Start Test")
         
@@ -71,11 +56,6 @@ pipeline {
         submitter "admin"
         parameters {
           choice(name: "TARGET_ENV", choices: ['DEV', 'STAGING', 'PRODUCTION'], description: "Which Environment?")
-        }
-      }
-      agent {
-        node {
-          label "linux"
         }
       }
       steps {
