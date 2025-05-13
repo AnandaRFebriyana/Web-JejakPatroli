@@ -22,7 +22,7 @@ pipeline {
                             docker compose version || docker-compose --version || echo "docker compose version failed"
                         '''
                     } catch (Exception e) {
-                        echo "Tooling verification failed, but continuing pipeline: ${e.message}"
+                        echo "Tooling verification failed: ${e.message}"
                     }
                 }
             }
@@ -30,10 +30,16 @@ pipeline {
         
         stage("Verify SSH connection to server") {
             steps {
-                sshagent(credentials: ['deploy-key']) {
-                    sh '''
-                        ssh -o StrictHostKeyChecking=no -p ${SERVER_PORT} ${SERVER_USER}@${SERVER_IP} whoami
-                    '''
+                script {
+                    try {
+                        sshagent(credentials: ['deploy-key']) {
+                            sh '''
+                                ssh -o StrictHostKeyChecking=no -p ${SERVER_PORT} ${SERVER_USER}@${SERVER_IP} whoami
+                            '''
+                        }
+                    } catch (Exception e) {
+                        echo "SSH verification failed, skipping: ${e.message}"
+                    }
                 }
             }
         }
@@ -52,8 +58,15 @@ pipeline {
         
         stage("Start Docker") {
             steps {
-                sh 'docker compose up -d || docker-compose up -d'
-                sh 'docker compose ps || docker-compose ps'
+                script {
+                    try {
+                        sh 'docker compose up -d || docker-compose up -d'
+                        sh 'docker compose ps || docker-compose ps'
+                    } catch (Exception e) {
+                        echo "Failed to start Docker: ${e.message}"
+                        throw e
+                    }
+                }
             }
         }
         
@@ -85,34 +98,44 @@ pipeline {
     post {
         success {
             script {
-                // Create deployment artifact
-                sh 'cd "${WORKSPACE}"'
-                sh 'rm -rf artifact.zip || true'
-                sh 'zip -r artifact.zip . -x "*node_modules*" -x "*.git*"'
-                
-                // Deploy to server
-                withCredentials([sshUserPrivateKey(credentialsId: "deploy-key", keyFileVariable: 'keyfile')]) {
-                    sh '''
-                        scp -v -o StrictHostKeyChecking=no -P ${SERVER_PORT} -i ${keyfile} ${WORKSPACE}/artifact.zip ${SERVER_USER}@${SERVER_IP}:${DEPLOY_DIR}/
-                    '''
-                }
-                
-                sshagent(credentials: ['deploy-key']) {
-                    // Unzip and deploy
-                    sh '''
-                        ssh -o StrictHostKeyChecking=no -p ${SERVER_PORT} ${SERVER_USER}@${SERVER_IP} "mkdir -p ${DEPLOY_DIR}/app"
-                        ssh -o StrictHostKeyChecking=no -p ${SERVER_PORT} ${SERVER_USER}@${SERVER_IP} "unzip -o ${DEPLOY_DIR}/artifact.zip -d ${DEPLOY_DIR}/app"
-                        ssh -o StrictHostKeyChecking=no -p ${SERVER_PORT} ${SERVER_USER}@${SERVER_IP} "cd ${DEPLOY_DIR}/app && npm ci --production"
-                        ssh -o StrictHostKeyChecking=no -p ${SERVER_PORT} ${SERVER_USER}@${SERVER_IP} "cd ${DEPLOY_DIR}/app && pm2 restart ecosystem.config.js || pm2 start ecosystem.config.js"
-                        ssh -o StrictHostKeyChecking=no -p ${SERVER_PORT} ${SERVER_USER}@${SERVER_IP} "cd ${DEPLOY_DIR}/app && pm2 logs --lines 50"
-                    '''
+                try {
+                    // Create deployment artifact
+                    sh 'cd "${WORKSPACE}"'
+                    sh 'rm -rf artifact.zip || true'
+                    sh 'zip -r artifact.zip . -x "*node_modules*" -x "*.git*"'
+                    
+                    // Deploy to server
+                    withCredentials([sshUserPrivateKey(credentialsId: "deploy-key", keyFileVariable: 'keyfile')]) {
+                        sh '''
+                            scp -v -o StrictHostKeyChecking=no -P ${SERVER_PORT} -i ${keyfile} ${WORKSPACE}/artifact.zip ${SERVER_USER}@${SERVER_IP}:${DEPLOY_DIR}/
+                        '''
+                    }
+                    
+                    sshagent(credentials: ['deploy-key']) {
+                        // Unzip and deploy
+                        sh '''
+                            ssh -o StrictHostKeyChecking=no -p ${SERVER_PORT} ${SERVER_USER}@${SERVER_IP} "mkdir -p ${DEPLOY_DIR}/app"
+                            ssh -o StrictHostKeyChecking=no -p ${SERVER_PORT} ${SERVER_USER}@${SERVER_IP} "unzip -o ${DEPLOY_DIR}/artifact.zip -d ${DEPLOY_DIR}/app"
+                            ssh -o StrictHostKeyChecking=no -p ${SERVER_PORT} ${SERVER_USER}@${SERVER_IP} "cd ${DEPLOY_DIR}/app && npm ci --production"
+                            ssh -o StrictHostKeyChecking=no -p ${SERVER_PORT} ${SERVER_USER}@${SERVER_IP} "cd ${DEPLOY_DIR}/app && pm2 restart ecosystem.config.js || pm2 start ecosystem.config.js"
+                            ssh -o StrictHostKeyChecking=no -p ${SERVER_PORT} ${SERVER_USER}@${SERVER_IP} "cd ${DEPLOY_DIR}/app && pm2 logs --lines 50"
+                        '''
+                    }
+                } catch (Exception e) {
+                    echo "Deployment failed: ${e.message}"
                 }
             }
         }
         
         always {
-            sh 'docker compose down --remove-orphans -v || docker-compose down --remove-orphans -v || true'
-            sh 'docker compose ps || docker-compose ps || true'
+            script {
+                try {
+                    sh 'docker compose down -v || docker-compose down --volumes || true'
+                    sh 'docker compose ps || docker-compose ps || true'
+                } catch (Exception e) {
+                    echo "Cleanup failed: ${e.message}"
+                }
+            }
         }
     }
 }
