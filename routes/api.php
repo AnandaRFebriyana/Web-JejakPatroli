@@ -21,8 +21,11 @@ Route::middleware('auth.guard')->group(function () {
 
     // schedule
     Route::get('/schedule', [ScheduleController::class, 'show']);
-    // map
-    Route::apiResource('locations', LocationController::class);
+    
+    // map & tracking
+    Route::apiResource('/locations', LocationController::class);
+    Route::get('/tracking-history', [LocationController::class, 'getTrackingHistory']);
+    
     // report
     Route::get('/history-report', [ReportController::class, 'getAll']);
     Route::post('/report/store', [ReportController::class, 'postReport']);
