@@ -19,8 +19,10 @@ class GuardController extends Controller {
         confirmDelete($title, $text);
 
         $guards = Guard::paginate(5);
+
         return view('pages.guard.guard', compact('guards'), [
             'title' => 'Data Satpam'
+
         ]);
     }
 
@@ -111,14 +113,13 @@ class GuardController extends Controller {
     /**
      * Remove the specified resource from storage.
      */
-        public function deleteGuard($id)
-    {
-        $guard = Guard::findOrFail($id);
+
+    public function destroy($id) {
+        $guard = Guard::find($id);
         $guard->delete();
+        return back()->with('success', 'Berhasil mengahapus data!');
 
-        return redirect()->route('guard.index')->with('success', 'Data satpam berhasil dihapus.');
     }
-
     public function getAccount($id) {
         $guard = Guard::find($id);
         return response()->json([
