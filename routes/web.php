@@ -49,7 +49,5 @@ Route::middleware('auth:admin')->group(function (){
             Route::put('/{id}', 'updateShift');
             Route::delete('/{id}/delete', 'destroyShift');
         });
-
-
     });
 });

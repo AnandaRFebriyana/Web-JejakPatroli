@@ -58,9 +58,16 @@ class GuardController extends Controller {
         $validatedData = $request->validated();
         $validatedData['password'] = Hash::make($validatedData['password']);
 
+        // if ($request->hasFile('photo')) {
+        //     $validatedData['photo'] = $request->file('photo')->store('photo-profile', 'public');
+        // }
         if ($request->hasFile('photo')) {
-            $validatedData['photo'] = $request->file('photo')->store('photo-profile', 'public');
+            $photo = $request->file('photo');
+            $filename = uniqid() . '.' . $photo->getClientOriginalExtension();
+            $photo->move(public_path('storage/photo-profile'), $filename);
+            $validatedData['photo'] = 'photo-profile/' . $filename;
         }
+
 
         Guard::create($validatedData);
         return redirect('/guard')->with('success','Berhasil menambah data!');
@@ -96,11 +103,21 @@ class GuardController extends Controller {
         ];
         $validatedData = $request->validate($rules);
 
+        // if ($request->file('photo')) {
+        //     if ($guard->photo) {
+        //         Storage::delete($guard->photo);
+        //     }
+        //     $validatedData['photo'] = $request->file('photo')->store('photo-profile', 'public');
+        // }
         if ($request->file('photo')) {
-            if ($guard->photo) {
-                Storage::delete($guard->photo);
+            if ($guard->photo && file_exists(public_path('storage/' . $guard->photo))) {
+                unlink(public_path('storage/' . $guard->photo));
             }
-            $validatedData['photo'] = $request->file('photo')->store('photo-profile', 'public');
+
+            $photo = $request->file('photo');
+            $filename = uniqid() . '.' . $photo->getClientOriginalExtension();
+            $photo->move(public_path('storage/photo-profile'), $filename);
+            $validatedData['photo'] = 'photo-profile/' . $filename;
         }
         $guard->update($validatedData);
 
