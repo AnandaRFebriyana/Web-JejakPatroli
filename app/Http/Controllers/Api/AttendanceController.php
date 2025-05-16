@@ -48,11 +48,24 @@ class AttendanceController extends Controller {
         if ($request->hasFile('photo')) {
             $validated['photo'] = $request->file('photo')->store('photo-attendance', 'public');
         }
+        
         $attendance = Attendance::findOrFail($id);
+        
+        // Get shift start time and add 15 minutes tolerance
+        $shift_start = Carbon::createFromFormat('H:i:s', $attendance->shift->start_time);
+        $late_threshold = $shift_start->copy()->addMinutes(15);
+        $check_in = Carbon::createFromFormat('H:i:s', $validated['check_in_time']);
+        
+        // Determine status based on check-in time
+        $status = 'Hadir';
+        if ($check_in->gt($late_threshold)) {
+            $status = 'Terlambat';
+        }
+
         $attendance->update([
             'check_in_time' => $validated['check_in_time'],
             'photo' => $validated['photo'],
-            'status' => 'Hadir',
+            'status' => $status,
             'longitude' => $validated['longitude'],
             'latitude' => $validated['latitude'],
             'location_address' => $validated['location_address'],

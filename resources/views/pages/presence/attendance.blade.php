@@ -60,6 +60,8 @@
                       <td class="p-2 text-center align-middle bg-transparent border-b dark:border-white/40 whitespace-nowrap shadow-transparent">
                         @if ($attendance->status == 'Hadir')
                             <span class="bg-gradient-to-tl from-emerald-500 to-teal-400 px-2.5 text-xs rounded-1.8 py-1.4 inline-block whitespace-nowrap text-center align-baseline font-bold uppercase leading-none text-white">Hadir</span>
+                        @elseif ($attendance->status == 'Terlambat')
+                            <span class="bg-gradient-to-tl from-yellow-600 to-yellow-400 px-2.5 text-xs rounded-1.8 py-1.4 inline-block whitespace-nowrap text-center align-baseline font-bold uppercase leading-none text-white">Terlambat</span>
                         @elseif ($attendance->check_in_time == null && $attendance->check_out_time == null && $attendance->date < now()->startOfDay())
                             <span class="bg-gradient-to-tl from-red-600 to-orange-600 px-2.5 text-xs rounded-1.8 py-1.4 inline-block whitespace-nowrap text-center align-baseline font-bold uppercase leading-none text-white">Tidak Hadir</span>
                         @elseif ($attendance->check_in_time == null && $attendance->check_out_time == null && $attendance->date == now()->toDateString() && now()->format('H:i:s') > $attendance->shift->end_time)
