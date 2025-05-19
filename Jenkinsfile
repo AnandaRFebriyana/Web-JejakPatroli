@@ -4,6 +4,7 @@ pipeline {
     environment {
         PATH = "/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin:$PATH"
         DOCKER_HOST = "unix:///var/run/docker.sock"
+        COMPOSE_PROJECT_NAME = "jejakpatroli_jenkins"
     }
 
     stages {
@@ -16,34 +17,70 @@ pipeline {
 
         stage('Build') {
             steps {
-                sh 'docker-compose build'
+                script {
+                    // Build dengan no cache untuk memastikan dependencies terupdate
+                    sh 'docker-compose build --no-cache'
+                }
             }
         }
 
         stage('Test') {
             steps {
-                sh 'docker-compose run --rm app php artisan test'
+                script {
+                    // Setup environment test
+                    sh 'docker-compose run --rm app composer install'
+                    sh 'docker-compose run --rm app cp .env.example .env'
+                    sh 'docker-compose run --rm app php artisan key:generate'
+                    
+                    // Jalankan test
+                    try {
+                        sh 'docker-compose run --rm app php artisan test'
+                    } catch (err) {
+                        error "Tests failed!"
+                    }
+                }
             }
         }
 
         stage('Deploy') {
             steps {
-                sh 'docker-compose down'
-                sh 'docker-compose up -d'
-                sh 'docker-compose exec app php artisan migrate --force'
+                script {
+                    // Stop dan remove container yang ada
+                    sh 'docker-compose down || true'
+                    
+                    // Jalankan service
+                    sh 'docker-compose up -d --force-recreate'
+                    
+                    // Tunggu sampai container siap
+                    sleep(time: 15, unit: 'SECONDS')
+                    
+                    // Setup database
+                    sh 'docker-compose exec app php artisan migrate --force'
+                    sh 'docker-compose exec app php artisan storage:link'
+                    
+                    // Cleanup
+                    sh 'docker system prune -f'
+                }
             }
         }
     }
 
     post {
         always {
+            // Clean workspace dan docker resources
             cleanWs()
+            sh 'docker-compose down || true'
         }
         success {
-            slackSend(color: '#00FF00', message: 'Pipeline Succeeded')
+            // Notifikasi sukses
+            slackSend(color: '#00FF00', message: "Pipeline SUCCESS - ${env.JOB_NAME} #${env.BUILD_NUMBER}")
+            sh 'echo "Deployment successful! Access at http://159.223.47.2"'
         }
         failure {
-            slackSend(color: '#FF0000', message: 'Pipeline Failed')
+            // Notifikasi gagal
+            slackSend(color: '#FF0000', message: "Pipeline FAILED - ${env.JOB_NAME} #${env.BUILD_NUMBER}")
+            sh 'docker-compose logs --tail=50 app > app_logs.txt'
+            archiveArtifacts artifacts: 'app_logs.txt'
         }
     }
 }
