@@ -35,7 +35,8 @@ pipeline {
                     def composerExists = sh(script: 'test -f composer.json && echo "true" || echo "false"', returnStdout: true).trim()
                     
                     if (composerExists == 'true') {
-                        sh 'docker run --rm -v "$(pwd)":/app composer:latest composer install --no-interaction'
+                        // Add the --ignore-platform-req=ext-gd flag to avoid GD extension error
+                        sh 'docker run --rm -v "$(pwd)":/app composer:latest composer install --no-interaction --ignore-platform-req=ext-gd'
                     } else {
                         echo "No composer.json found. Skipping dependency installation."
                         // Try to initialize a new Laravel project if needed
@@ -54,7 +55,10 @@ pipeline {
                 expression { return sh(script: 'test -f artisan && echo "true" || echo "false"', returnStdout: true).trim() == 'true' }
             }
             steps {
-                sh 'docker run --rm -v "$(pwd)":/app -w /app php:8.1-cli php artisan key:generate'
+                // Using a PHP image with GD extension installed for Laravel operations
+                sh '''
+                docker run --rm -v "$(pwd)":/app -w /app php:8.1-cli-alpine sh -c "apk add --no-cache freetype-dev libjpeg-turbo-dev libpng-dev && docker-php-ext-configure gd --with-freetype --with-jpeg && docker-php-ext-install gd && php artisan key:generate"
+                '''
             }
         }
         
@@ -63,7 +67,10 @@ pipeline {
                 expression { return sh(script: 'test -f artisan && echo "true" || echo "false"', returnStdout: true).trim() == 'true' }
             }
             steps {
-                sh 'docker run --rm -v "$(pwd)":/app -w /app php:8.1-cli php artisan test'
+                // Using a PHP image with GD extension installed for running tests
+                sh '''
+                docker run --rm -v "$(pwd)":/app -w /app php:8.1-cli-alpine sh -c "apk add --no-cache freetype-dev libjpeg-turbo-dev libpng-dev && docker-php-ext-configure gd --with-freetype --with-jpeg && docker-php-ext-install gd && php artisan test"
+                '''
             }
         }
         
@@ -97,12 +104,15 @@ pipeline {
     post {
         always {
             echo 'Pipeline completed'
+            // Clean up any Docker containers that might be left running
+            sh 'docker ps -q | xargs -r docker stop || true'
         }
         success {
             echo 'Pipeline succeeded'
         }
         failure {
             echo 'Pipeline failed'
+            // You could add notification steps here
         }
     }
 }
