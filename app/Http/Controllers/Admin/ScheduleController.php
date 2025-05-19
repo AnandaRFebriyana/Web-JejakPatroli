@@ -90,7 +90,7 @@ class ScheduleController extends Controller {
 
     public function editGuard($id) {
         return view('pages.schedule.edit', [
-            'title' => 'Presensi',
+            'title' => 'Jadwal',
             'schedule' => Schedule::find($id),
             'shifts' => Shift::all(),
             'guards' => Guard::all(),
