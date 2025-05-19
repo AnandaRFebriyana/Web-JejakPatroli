@@ -40,8 +40,8 @@
                             @endif
 
                             <div class="p-6 pb-0 mb-0">
-                                <h4 class="font-bold">Sign In</h4>
-                                <p class="mb-0">Enter your email and password to sign in</p>
+                                <h4 class="font-bold">Masuk</h4>
+                                <p class="mb-0">Masukkan Email dan Password anda untuk masuk</p>
                             </div>
                             <div class="flex-auto p-6">
                                 <form action="/" method="POST">
@@ -70,7 +70,7 @@
                                     <div class="text-center">
                                         <button type="submit"
                                             class="inline-block w-full px-16 py-3.5 mt-6 mb-0 font-bold leading-normal text-center text-white align-middle transition-all bg-tosca border-0 rounded-lg cursor-pointer hover:-translate-y-px active:opacity-85 hover:shadow-xs text-sm ease-in tracking-tight-rem shadow-md bg-150 bg-x-25">
-                                            Sign in</button>
+                                            Masuk</button>
                                     </div>
                                 </form>
                             </div>
@@ -80,10 +80,9 @@
                         <div class="relative flex flex-col justify-center h-full bg-gradient-to-b from-[#37B6E9] to-[#242C3B] px-24 m-4 overflow-hidden rounded-xl ">
                             <span class="absolute top-0 left-0 w-full h-full bg-center bg-cover bg-gradient-to-tl from-zinc-800 opacity-60"></span>
                             <img src="{{ asset('assets/img/logo-jejakpatroli.png') }}" alt="Logo Jejak Patroli" style="width: 240px; margin-bottom: 4px" class="z-10 mx-auto h-auto">
-                            <h3 class="z-20 mt-2 font-bold text-white typing-animation">Welcome back to Jejak Patroli !!!</h3>
+                            <h3 class="z-20 mt-2 font-bold text-white typing-animation">Selamat Datang di Jejak Patroli !!!</h3>
                             <p class="z-20 text-white ">
-                            Where monitoring field activities becomes effortless, ensuring real-time tracking
-                            and comprehensive reporting for security patrols and field observations.
+                            Di mana pemantauan aktivitas lapangan menjadi mudah, memastikan tracking real time dan pelaporan komprehensif untuk patroli keamanan dan observasi lapangan.
                             </p>
                         </div>
                     </div>
