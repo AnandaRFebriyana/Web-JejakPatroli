@@ -1,141 +1,79 @@
 pipeline {
     agent any
     
-    environment {
-        PROJECT_NAME = "Web-JejakPatroli"
-        REPO_URL = "https://github.com/AnandaRFebriyana/Web-JejakPatroli"
-        SERVER_IP = "141.11.190.114"
-        SERVER_USER = "root"
-        SERVER_PORT = "33333"
-        DEPLOY_DIR = "/home/ubuntu/deployments/${PROJECT_NAME}"
-    }
-    
     stages {
-        stage("Verify tooling") {
+        stage('Checkout') {
             steps {
-                script {
-                    try {
-                        sh '''
-                            set -x
-                            docker info || echo "docker info failed"
-                            docker version || echo "docker version failed"
-                            docker compose version || docker-compose --version || echo "docker compose version failed"
-                        '''
-                    } catch (Exception e) {
-                        echo "Tooling verification failed: ${e.message}"
-                    }
+                checkout scm
+            }
+        }
+        
+        stage('Setup Environment') {
+            steps {
+                sh 'cp .env.example .env'
+                sh 'sed -i "s/DB_HOST=127.0.0.1/DB_HOST=mysql/g" .env'
+                sh 'sed -i "s/DB_DATABASE=laravel/DB_DATABASE=jejakpatroli/g" .env'
+                sh 'sed -i "s/DB_USERNAME=root/DB_USERNAME=root/g" .env'
+                sh 'sed -i "s/DB_PASSWORD=.*/DB_PASSWORD=/g" .env'
+            }
+        }
+        
+        stage('Install Dependencies') {
+            steps {
+                sh 'docker run --rm -v $(pwd):/app composer:latest composer install --no-interaction'
+            }
+        }
+        
+        stage('Generate Key') {
+            steps {
+                sh 'docker run --rm -v $(pwd):/app -w /app php:8.1-cli php artisan key:generate'
+            }
+        }
+        
+        stage('Run Tests') {
+            steps {
+                sh 'docker run --rm -v $(pwd):/app -w /app php:8.1-cli vendor/bin/phpunit --log-junit tests/results/results.xml || true'
+            }
+            post {
+                always {
+                    junit 'tests/results/results.xml'
                 }
             }
         }
         
-        stage("Verify SSH connection to server") {
+        stage('Deploy to Production') {
+            when {
+                branch 'main'
+            }
             steps {
-                script {
-                    try {
-                        sshagent(credentials: ['deploy-key']) {
-                            sh '''
-                                ssh -o StrictHostKeyChecking=no -p ${SERVER_PORT} ${SERVER_USER}@${SERVER_IP} whoami
-                            '''
-                        }
-                    } catch (Exception e) {
-                        echo "SSH verification failed, skipping: ${e.message}"
-                    }
-                }
+                sh 'mkdir -p nginx/conf.d'
+                sh 'echo "server { listen 80; server_name _; root /var/www/public; add_header X-Frame-Options \\"SAMEORIGIN\\"; add_header X-XSS-Protection \\"1; mode=block\\"; add_header X-Content-Type-Options \\"nosniff\\"; index index.php; charset utf-8; location / { try_files \\$uri \\$uri/ /index.php?\\$query_string; } location = /favicon.ico { access_log off; log_not_found off; } location = /robots.txt  { access_log off; log_not_found off; } error_page 404 /index.php; location ~ \\.php$ { fastcgi_pass app:9000; fastcgi_param SCRIPT_FILENAME \\$realpath_root\\$fastcgi_script_name; include fastcgi_params; } location ~ /\\.(?!well-known).* { deny all; } }" > nginx/conf.d/app.conf'
+                sh 'docker-compose down || true'
+                sh 'docker-compose up -d --build'
+                sh 'docker exec jejakpatroli-app php artisan migrate --force'
             }
         }
         
-        stage("Clear all running docker containers") {
-            steps {
-                script {
-                    try {
-                        sh 'docker rm -f $(docker ps -a -q) || true'
-                    } catch (Exception e) {
-                        echo 'No running containers to clear up...'
-                    }
-                }
+        stage('Setup Monitoring') {
+            when {
+                branch 'main'
             }
-        }
-        
-        stage("Start Docker") {
             steps {
-                script {
-                    try {
-                        sh 'docker compose up -d || docker-compose up -d'
-                        sh 'docker compose ps || docker-compose ps'
-                    } catch (Exception e) {
-                        echo "Failed to start Docker: ${e.message}"
-                        throw e
-                    }
-                }
-            }
-        }
-        
-        stage("Install Dependencies") {
-            steps {
-                sh 'docker compose run --rm node npm ci || docker-compose run --rm node npm ci'
-            }
-        }
-        
-        stage("Build Application") {
-            steps {
-                sh 'docker compose run --rm node npm run build || docker-compose run --rm node npm run build'
-            }
-        }
-        
-        stage("Run Tests") {
-            steps {
-                script {
-                    try {
-                        sh 'docker compose run --rm node npm test || docker-compose run --rm node npm test'
-                    } catch (Exception e) {
-                        echo 'Tests failed, but continuing the pipeline...'
-                    }
-                }
+                sh 'docker run --rm -d -p 3000:3000 --name grafana grafana/grafana-oss'
+                sh 'docker run --rm -d -p 9090:9090 --name prometheus prom/prometheus'
             }
         }
     }
     
     post {
-        success {
-            script {
-                try {
-                    // Create deployment artifact
-                    sh 'cd "${WORKSPACE}"'
-                    sh 'rm -rf artifact.zip || true'
-                    sh 'zip -r artifact.zip . -x "*node_modules*" -x "*.git*"'
-                    
-                    // Deploy to server
-                    withCredentials([sshUserPrivateKey(credentialsId: "deploy-key", keyFileVariable: 'keyfile')]) {
-                        sh '''
-                            scp -v -o StrictHostKeyChecking=no -P ${SERVER_PORT} -i ${keyfile} ${WORKSPACE}/artifact.zip ${SERVER_USER}@${SERVER_IP}:${DEPLOY_DIR}/
-                        '''
-                    }
-                    
-                    sshagent(credentials: ['deploy-key']) {
-                        // Unzip and deploy
-                        sh '''
-                            ssh -o StrictHostKeyChecking=no -p ${SERVER_PORT} ${SERVER_USER}@${SERVER_IP} "mkdir -p ${DEPLOY_DIR}/app"
-                            ssh -o StrictHostKeyChecking=no -p ${SERVER_PORT} ${SERVER_USER}@${SERVER_IP} "unzip -o ${DEPLOY_DIR}/artifact.zip -d ${DEPLOY_DIR}/app"
-                            ssh -o StrictHostKeyChecking=no -p ${SERVER_PORT} ${SERVER_USER}@${SERVER_IP} "cd ${DEPLOY_DIR}/app && npm ci --production"
-                            ssh -o StrictHostKeyChecking=no -p ${SERVER_PORT} ${SERVER_USER}@${SERVER_IP} "cd ${DEPLOY_DIR}/app && pm2 restart ecosystem.config.js || pm2 start ecosystem.config.js"
-                            ssh -o StrictHostKeyChecking=no -p ${SERVER_PORT} ${SERVER_USER}@${SERVER_IP} "cd ${DEPLOY_DIR}/app && pm2 logs --lines 50"
-                        '''
-                    }
-                } catch (Exception e) {
-                    echo "Deployment failed: ${e.message}"
-                }
-            }
-        }
-        
         always {
-            script {
-                try {
-                    sh 'docker compose down -v || docker-compose down --volumes || true'
-                    sh 'docker compose ps || docker-compose ps || true'
-                } catch (Exception e) {
-                    echo "Cleanup failed: ${e.message}"
-                }
-            }
+            echo 'Pipeline completed'
+        }
+        success {
+            echo 'Pipeline succeeded'
+        }
+        failure {
+            echo 'Pipeline failed'
         }
     }
 }
