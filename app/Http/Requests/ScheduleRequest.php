@@ -18,6 +18,17 @@ class ScheduleRequest extends FormRequest {
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
     public function rules(): array {
+        // Jika ada start_date dan end_date, berarti ini adalah pembuatan jadwal baru
+        if ($this->has('start_date') && $this->has('end_date')) {
+            return [
+                'guard_id' => 'required',
+                'shift_id' => 'required',
+                'start_date' => 'required|date',
+                'end_date' => 'required|date|after_or_equal:start_date',
+            ];
+        }
+        
+        // Jika ada schedule_date, berarti ini adalah update jadwal
         return [
             'guard_id' => 'required',
             'shift_id' => 'required',
@@ -30,7 +41,12 @@ class ScheduleRequest extends FormRequest {
         return [
             'guard_id.required' => 'Nama Satpam harus diisi.',
             'shift_id.required' => 'Shift harus diisi.',
-            'day.required' => 'Hari harus diisi.'
+            'day.required' => 'Hari harus diisi.',
+            'schedule_date.required' => 'Tanggal jadwal harus diisi.',
+            'schedule_date.date' => 'Format tanggal tidak valid.',
+            'start_date.required' => 'Tanggal mulai harus diisi.',
+            'end_date.required' => 'Tanggal selesai harus diisi.',
+            'end_date.after_or_equal' => 'Tanggal selesai harus sama dengan atau setelah tanggal mulai.'
         ];
     }
 }

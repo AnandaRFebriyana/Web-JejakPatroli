@@ -60,7 +60,9 @@
                                         <p class="mb-0 text-xs leading-tight dark:text-white dark:opacity-80 text-slate-400">{{ $schedule->shift->start_time }} - {{ $schedule->shift->end_time }}</p>
                                     </td>
                                     <td class="p-2 text-center align-middle bg-transparent border-b dark:border-white/40 whitespace-nowrap shadow-transparent">
-                                        <p class="mb-0 text-xs leading-tight dark:text-white dark:opacity-80 text-slate-400">{{ $schedule->schedule_date }}</p>
+                                        <p class="mb-0 text-xs leading-tight dark:text-white dark:opacity-80 text-slate-400">
+                                            {{ $schedule->schedule_date ? \Carbon\Carbon::parse($schedule->schedule_date)->format('d/m/Y') : '-' }}
+                                        </p>
                                     </td>
                                     <td class="p-2 text-center align-middle bg-transparent border-b dark:border-white/40 whitespace-nowrap shadow-transparent">
                                         <a href="/schedules/guard/{{ $schedule->id }}/edit" class="btn btn-secondary text-xs border-0">

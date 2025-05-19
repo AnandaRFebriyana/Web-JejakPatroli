@@ -8,12 +8,11 @@
                     <form method="POST" action="/schedules/guard/store">
                         @csrf
                         <div class="flex-auto p-6">
-
                             <div class="w-full max-w-full px-3 shrink-0 md:w-full md:flex-0">
                                 <div class="mb-4">
                                     <label for="guard_id"
                                         class="inline-block mb-2 ml-1 font-bold text-xs text-slate-700 dark:text-white/80">Nama Satpam</label>
-                                    <select id="guard_id" name="guard_id"
+                                    <select id="guard_id" name="guard_id" required
                                         class="form-control @error('guard_id') is-invalid @enderror focus:shadow-primary-outline dark:bg-slate-850 dark:text-white text-sm leading-5.6 ease block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding px-3 py-2 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:border-blue-500 focus:outline-none">
                                         <option value="" selected disabled>Pilih Nama</option>
                                         @foreach ($guards as $guard)
@@ -30,9 +29,9 @@
                                 <div class="mb-4">
                                     <label for="shift_id"
                                         class="inline-block mb-2 ml-1 font-bold text-xs text-slate-700 dark:text-white/80">Shift</label>
-                                    <select id="shift_id" name="shift_id"
+                                    <select id="shift_id" name="shift_id" required
                                         class="form-control @error('shift_id') is-invalid @enderror focus:shadow-primary-outline dark:bg-slate-850 dark:text-white text-sm leading-5.6 ease block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding px-3 py-2 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:border-blue-500 focus:outline-none">
-                                        <option value="" selected disabled>Pilih Shift</option>
+                                        <option value="">Pilih Shift</option>
                                         @foreach ($shifts as $shift)
                                             <option value="{{ $shift->id }}">{{ $shift->start_time }} - {{ $shift->end_time }}</option>
                                         @endforeach
@@ -45,11 +44,11 @@
 
                             <div class="w-full max-w-full px-3 shrink-0 md:w-full md:flex-0">
                                 <div class="mb-4">
-                                    <label for="schedule_date"
-                                        class="inline-block mb-2 ml-1 font-bold text-xs text-slate-700 dark:text-white/80">Tanggal Jadwal</label>
-                                    <input type="date" id="schedule_date" name="schedule_date"
-                                        class="form-control @error('schedule_date') is-invalid @enderror focus:shadow-primary-outline dark:bg-slate-850 dark:text-white text-sm leading-5.6 ease block w-full rounded-lg border border-solid border-gray-300 bg-white px-3 py-2 text-gray-700 placeholder:text-gray-500 focus:border-blue-500 focus:outline-none">
-                                    @error('schedule_date')
+                                    <label for="start_date"
+                                        class="inline-block mb-2 ml-1 font-bold text-xs text-slate-700 dark:text-white/80">Tanggal Mulai</label>
+                                    <input type="date" id="start_date" name="start_date" required
+                                        class="form-control @error('start_date') is-invalid @enderror focus:shadow-primary-outline dark:bg-slate-850 dark:text-white text-sm leading-5.6 ease block w-full rounded-lg border border-solid border-gray-300 bg-white px-3 py-2 text-gray-700 placeholder:text-gray-500 focus:border-blue-500 focus:outline-none">
+                                    @error('start_date')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
@@ -57,40 +56,62 @@
 
                             <div class="w-full max-w-full px-3 shrink-0 md:w-full md:flex-0">
                                 <div class="mb-4">
-                                    <label for="day" class="inline-block mb-2 ml-1 font-bold text-xs text-slate-700 dark:text-white/80">Hari</label>
-                                    <select id="day" name="day"
-                                        class="form-control @error('day') is-invalid @enderror focus:shadow-primary-outline dark:bg-slate-850 dark:text-white text-sm leading-5.6 ease block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding px-3 py-2 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:border-blue-500 focus:outline-none">
-                                        <option value="" selected disabled>Pilih Hari</option>
-                                        @foreach(['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'] as $day)
-                                            <option value="{{ $day }}">{{ $day }}</option>
-                                        @endforeach
-                                    </select>
-                                    @error('day')
+                                    <label for="end_date"
+                                        class="inline-block mb-2 ml-1 font-bold text-xs text-slate-700 dark:text-white/80">Tanggal Selesai</label>
+                                    <input type="date" id="end_date" name="end_date" required
+                                        class="form-control @error('end_date') is-invalid @enderror focus:shadow-primary-outline dark:bg-slate-850 dark:text-white text-sm leading-5.6 ease block w-full rounded-lg border border-solid border-gray-300 bg-white px-3 py-2 text-gray-700 placeholder:text-gray-500 focus:border-blue-500 focus:outline-none">
+                                    @error('end_date')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
                             </div>
 
+                            <div id="schedule_preview" class="mb-4">
+                                <h6 class="font-bold text-xs text-slate-700 dark:text-white/80 mb-2">Preview Jadwal:</h6>
+                                <div id="schedule_list" class="text-sm"></div>
+                            </div>
+
                             <script>
                                 document.addEventListener('DOMContentLoaded', function () {
-                                    const dateInput = document.getElementById('schedule_date');
-                                    const daySelect = document.getElementById('day');
-
+                                    const startDateInput = document.getElementById('start_date');
+                                    const endDateInput = document.getElementById('end_date');
+                                    const scheduleList = document.getElementById('schedule_list');
                                     const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
 
-                                    dateInput.addEventListener('change', function () {
-                                        const selectedDate = new Date(this.value);
-                                        if (!isNaN(selectedDate)) {
-                                            const dayIndex = selectedDate.getDay(); // 0 (Minggu) sampai 6 (Sabtu)
-                                            const dayName = days[dayIndex];
+                                    function updateSchedulePreview() {
+                                        const startDate = new Date(startDateInput.value);
+                                        const endDate = new Date(endDateInput.value);
 
-                                            // Set nilai dropdown otomatis
-                                            daySelect.value = dayName;
+                                        if (!isNaN(startDate) && !isNaN(endDate)) {
+                                            let html = '<ul class="list-disc pl-4">';
+                                            let currentDate = new Date(startDate);
+
+                                            while (currentDate <= endDate) {
+                                                const dayIndex = currentDate.getDay();
+                                                const dayName = days[dayIndex];
+                                                const formattedDate = currentDate.toLocaleDateString('id-ID', {
+                                                    day: 'numeric',
+                                                    month: 'long',
+                                                    year: 'numeric'
+                                                });
+
+                                                html += `<li>${dayName}, ${formattedDate}</li>`;
+                                                
+                                                // Increment date by 1 day
+                                                currentDate.setDate(currentDate.getDate() + 1);
+                                            }
+
+                                            html += '</ul>';
+                                            scheduleList.innerHTML = html;
+                                        } else {
+                                            scheduleList.innerHTML = '';
                                         }
-                                    });
+                                    }
+
+                                    startDateInput.addEventListener('change', updateSchedulePreview);
+                                    endDateInput.addEventListener('change', updateSchedulePreview);
                                 });
                             </script>
-
 
                             <div class="modal-footer">
                                 <button type="submit" class="inline-block px-8 py-2 mb-4 font-bold leading-normal text-center text-white align-middle transition-all ease-in bg-tosca border-0 rounded-lg shadow-md cursor-pointer text-xs tracking-tight-rem hover:shadow-xs hover:-translate-y-px active:opacity-85">Simpan</button>
