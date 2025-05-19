@@ -19,7 +19,7 @@ pipeline {
             steps {
                 script {
                     // Build dengan no cache untuk memastikan dependencies terupdate
-                    sh 'docker-compose build --no-cache'
+                    sh '/usr/local/bin/docker-compose build --no-cache'
                 }
             }
         }
