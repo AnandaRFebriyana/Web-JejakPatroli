@@ -2,7 +2,9 @@ pipeline {
     agent any
 
     environment {
+        PATH = "/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:$PATH"
         DOCKER_HOST = "unix:///var/run/docker.sock"
+        COMPOSE_PROJECT_NAME = "jejakpatroli_jenkins"
     }
 
     stages {
@@ -15,21 +17,30 @@ pipeline {
 
         stage('Build') {
             steps {
-                sh 'docker-compose build'
+                sh '/usr/local/bin/docker-compose build --no-cache'
             }
         }
 
         stage('Test') {
             steps {
-                sh 'docker-compose run --rm app php artisan test'
+                script {
+                    try {
+                        sh '/usr/local/bin/docker-compose run --rm app php artisan test'
+                    } catch (err) {
+                        error "Tests failed!"
+                    }
+                }
             }
         }
 
         stage('Deploy') {
             steps {
-                sh 'docker-compose down'
-                sh 'docker-compose up -d'
-                sh 'docker-compose exec app php artisan migrate --force'
+                script {
+                    sh '/usr/local/bin/docker-compose down || true'
+                    sh '/usr/local/bin/docker-compose up -d --force-recreate'
+                    sleep(time: 15, unit: 'SECONDS')
+                    sh '/usr/local/bin/docker-compose exec app php artisan migrate --force'
+                }
             }
         }
     }
@@ -37,12 +48,16 @@ pipeline {
     post {
         always {
             cleanWs()
+            sh '/usr/local/bin/docker-compose down || true'
         }
         success {
-            slackSend(color: '#00FF00', message: 'Pipeline Succeeded')
+            echo 'Pipeline SUCCESS!'
+            echo 'Aplikasi berhasil di-deploy di http://159.223.47.2'
         }
         failure {
-            slackSend(color: '#FF0000', message: 'Pipeline Failed')
+            echo 'Pipeline FAILED!'
+            sh '/usr/local/bin/docker-compose logs --tail=50 > docker_logs.txt'
+            archiveArtifacts artifacts: 'docker_logs.txt'
         }
     }
 }
