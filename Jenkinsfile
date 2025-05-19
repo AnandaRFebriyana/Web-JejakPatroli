@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        PATH = "/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin:$PATH"
+        PATH = "/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:$PATH"
         DOCKER_HOST = "unix:///var/run/docker.sock"
         COMPOSE_PROJECT_NAME = "jejakpatroli_jenkins"
     }
@@ -17,24 +17,15 @@ pipeline {
 
         stage('Build') {
             steps {
-                script {
-                    // Build dengan no cache untuk memastikan dependencies terupdate
-                    dockerCompose.build('--no-cache')
-                }
+                sh '/usr/local/bin/docker-compose build --no-cache'
             }
         }
 
         stage('Test') {
             steps {
                 script {
-                    // Setup environment test
-                    sh 'docker-compose run --rm app composer install'
-                    sh 'docker-compose run --rm app cp .env.example .env'
-                    sh 'docker-compose run --rm app php artisan key:generate'
-                    
-                    // Jalankan test
                     try {
-                        sh 'docker-compose run --rm app php artisan test'
+                        sh '/usr/local/bin/docker-compose run --rm app php artisan test'
                     } catch (err) {
                         error "Tests failed!"
                     }
@@ -45,21 +36,10 @@ pipeline {
         stage('Deploy') {
             steps {
                 script {
-                    // Stop dan remove container yang ada
-                    sh 'docker-compose down || true'
-                    
-                    // Jalankan service
-                    sh 'docker-compose up -d --force-recreate'
-                    
-                    // Tunggu sampai container siap
+                    sh '/usr/local/bin/docker-compose down || true'
+                    sh '/usr/local/bin/docker-compose up -d --force-recreate'
                     sleep(time: 15, unit: 'SECONDS')
-                    
-                    // Setup database
-                    sh 'docker-compose exec app php artisan migrate --force'
-                    sh 'docker-compose exec app php artisan storage:link'
-                    
-                    // Cleanup
-                    sh 'docker system prune -f'
+                    sh '/usr/local/bin/docker-compose exec app php artisan migrate --force'
                 }
             }
         }
@@ -67,20 +47,17 @@ pipeline {
 
     post {
         always {
-            // Clean workspace dan docker resources
             cleanWs()
-            sh 'docker-compose down || true'
+            sh '/usr/local/bin/docker-compose down || true'
         }
         success {
-            // Notifikasi sukses
-            slackSend(color: '#00FF00', message: "Pipeline SUCCESS - ${env.JOB_NAME} #${env.BUILD_NUMBER}")
-            sh 'echo "Deployment successful! Access at http://159.223.47.2"'
+            echo 'Pipeline SUCCESS!'
+            echo 'Aplikasi berhasil di-deploy di http://159.223.47.2'
         }
         failure {
-            // Notifikasi gagal
-            slackSend(color: '#FF0000', message: "Pipeline FAILED - ${env.JOB_NAME} #${env.BUILD_NUMBER}")
-            sh 'docker-compose logs --tail=50 app > app_logs.txt'
-            archiveArtifacts artifacts: 'app_logs.txt'
+            echo 'Pipeline FAILED!'
+            sh '/usr/local/bin/docker-compose logs --tail=50 > docker_logs.txt'
+            archiveArtifacts artifacts: 'docker_logs.txt'
         }
     }
 }
