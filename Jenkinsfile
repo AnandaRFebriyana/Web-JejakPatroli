@@ -1,5 +1,21 @@
+
 pipeline {
     agent any
+    
+    options {
+        // Add timeout to prevent hung builds
+        timeout(time: 60, unit: 'MINUTES')
+        // Discard old builds
+        buildDiscarder(logRotator(numToKeepStr: '10'))
+    }
+    
+    environment {
+        // Define Docker parameters for better resource management
+        DOCKER_ARGS = '--memory=512m --memory-swap=512m --cpus=0.5'
+        // Define a common PHP Docker image to use
+        PHP_IMAGE = 'php:8.1-cli-alpine'
+        COMPOSER_IMAGE = 'composer:latest'
+    }
     
     stages {
         stage('Checkout') {
@@ -36,15 +52,10 @@ pipeline {
                     
                     if (composerExists == 'true') {
                         // Add the --ignore-platform-req=ext-gd flag to avoid GD extension error
-                        sh 'docker run --rm -v "$(pwd)":/app composer:latest composer install --no-interaction --ignore-platform-req=ext-gd'
+                        // Use environment variables for Docker arguments
+                        sh "docker run --rm ${env.DOCKER_ARGS} -v \"$(pwd)\":/app ${env.COMPOSER_IMAGE} composer install --no-interaction --ignore-platform-req=ext-gd"
                     } else {
                         echo "No composer.json found. Skipping dependency installation."
-                        // Try to initialize a new Laravel project if needed
-                        def initLaravel = false // Change to true if you want to initialize Laravel
-                        
-                        if (initLaravel) {
-                            sh 'docker run --rm -v "$(pwd)":/app composer:latest composer create-project --prefer-dist laravel/laravel .'
-                        }
                     }
                 }
             }
@@ -56,9 +67,14 @@ pipeline {
             }
             steps {
                 // Using a PHP image with GD extension installed for Laravel operations
-                sh '''
-                docker run --rm -v "$(pwd)":/app -w /app php:8.1-cli-alpine sh -c "apk add --no-cache freetype-dev libjpeg-turbo-dev libpng-dev && docker-php-ext-configure gd --with-freetype --with-jpeg && docker-php-ext-install gd && php artisan key:generate"
-                '''
+                sh """
+                docker run --rm ${env.DOCKER_ARGS} -v \"$(pwd)\":/app -w /app ${env.PHP_IMAGE} sh -c \"
+                    apk add --no-cache freetype-dev libjpeg-turbo-dev libpng-dev && 
+                    docker-php-ext-configure gd --with-freetype --with-jpeg && 
+                    docker-php-ext-install gd && 
+                    php artisan key:generate
+                \"
+                """
             }
         }
         
@@ -68,9 +84,14 @@ pipeline {
             }
             steps {
                 // Using a PHP image with GD extension installed for running tests
-                sh '''
-                docker run --rm -v "$(pwd)":/app -w /app php:8.1-cli-alpine sh -c "apk add --no-cache freetype-dev libjpeg-turbo-dev libpng-dev && docker-php-ext-configure gd --with-freetype --with-jpeg && docker-php-ext-install gd && php artisan test"
-                '''
+                sh """
+                docker run --rm ${env.DOCKER_ARGS} -v \"$(pwd)\":/app -w /app ${env.PHP_IMAGE} sh -c \"
+                    apk add --no-cache freetype-dev libjpeg-turbo-dev libpng-dev && 
+                    docker-php-ext-configure gd --with-freetype --with-jpeg && 
+                    docker-php-ext-install gd && 
+                    php artisan test
+                \"
+                """
             }
         }
         
@@ -104,15 +125,30 @@ pipeline {
     post {
         always {
             echo 'Pipeline completed'
-            // Clean up any Docker containers that might be left running
-            sh 'docker ps -q | xargs -r docker stop || true'
+            // Thorough Docker cleanup
+            script {
+                // Stop all running containers created by this build
+                sh 'docker ps -q --filter "status=running" | xargs -r docker stop || true'
+                // Remove all containers created by this build
+                sh 'docker ps -a -q | xargs -r docker rm -f || true'
+                // Clean up any unused volumes
+                sh 'docker volume prune -f || true'
+                // Clean up any unused networks
+                sh 'docker network prune -f || true'
+                // Optional: clean up dangling images (use cautiously)
+                // sh 'docker image prune -f || true'
+            }
         }
         success {
             echo 'Pipeline succeeded'
         }
         failure {
             echo 'Pipeline failed'
-            // You could add notification steps here
+            // Add notification steps here if needed
+            // For example: slackSend channel: '#jenkins', color: 'danger', message: "Build failed: ${env.JOB_NAME} ${env.BUILD_NUMBER}"
+        }
+        unstable {
+            echo 'Pipeline is unstable'
         }
     }
 }
