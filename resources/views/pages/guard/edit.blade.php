@@ -49,8 +49,15 @@
                                 <div class="mb-4">
                                     <label for="phone_number"
                                         class="inline-block mb-2 ml-1 font-bold text-xs text-slate-700 dark:text-white/80">Nomor Telepon</label>
-                                    <input type="text" name="phone_number" value="{{ old('phone_number', $guard->phone_number) }}"
-                                        class="form-control @error('phone_number') is-invalid @enderror focus:shadow-primary-outline dark:bg-slate-850 dark:text-white text-sm leading-5.6 ease block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding px-3 py-2 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:border-blue-500 focus:outline-none" />
+                                    <input type="tel"
+                                           name="phone_number"
+                                           value="{{ old('phone_number', $guard->phone_number) }}"
+                                           pattern="[0-9]*"
+                                           minlength="10"
+                                           maxlength="13"
+                                           oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+                                           class="form-control @error('phone_number') is-invalid @enderror focus:shadow-primary-outline dark:bg-slate-850 dark:text-white text-sm leading-5.6 ease block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding px-3 py-2 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:border-blue-500 focus:outline-none"
+                                           placeholder="Contoh: 081234567890" />
                                     @error('phone_number')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror

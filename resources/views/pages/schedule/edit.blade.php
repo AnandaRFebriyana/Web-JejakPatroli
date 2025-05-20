@@ -61,7 +61,7 @@
                             </div>
 
 
-                            <div class="w-full max-w-full px-3 shrink-0 md:w-full md:flex-0">
+                            {{-- <div class="w-full max-w-full px-3 shrink-0 md:w-full md:flex-0">
                                 <div class="mb-4">
                                     <label for="day" class="inline-block mb-2 ml-1 font-bold text-xs text-slate-700 dark:text-white/80">Hari</label>
                                     <select id="day" name="day" required
@@ -102,7 +102,55 @@
                                         updateDayFromDate(dateInput.value);
                                     }
                                 });
+                            </script> --}}
+                            <div class="mb-4">
+                                <label for="day_display" class="inline-block mb-2 ml-1 font-bold text-xs text-slate-700 dark:text-white/80">Hari</label>
+                                <select id="day_display" disabled
+                                    class="form-control text-sm leading-5.6 ease block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-gray-100 bg-clip-padding px-3 py-2 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:outline-none dark:bg-slate-850 dark:text-white">
+                                    <option value="">Pilih Hari</option>
+                                    @foreach(['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'] as $day)
+                                     <option value="{{ $day }}" {{ $day == $schedule->day ? 'selected' : '' }}>{{ $day }}</option>
+                                    @endforeach
+                                </select>
+                                <input type="hidden" name="day" id="day" value="{{ $schedule->day }}">
+                            </div>
+                            <script>
+                                document.addEventListener('DOMContentLoaded', function () {
+                                    const dateInput = document.getElementById('schedule_date');
+                                    const daySelect = document.getElementById('day');
+                                    const dayDisplay = document.getElementById('day_display');
+
+                                    const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+
+                                    function updateDayFromDate(dateStr) {
+                                        const selectedDate = new Date(dateStr);
+                                        if (!isNaN(selectedDate)) {
+                                            const dayIndex = selectedDate.getDay();
+                                            const dayName = days[dayIndex];
+
+                                            // Update value pada display (disabled select)
+                                            for (let i = 0; i < dayDisplay.options.length; i++) {
+                                                if (dayDisplay.options[i].value === dayName) {
+                                                    dayDisplay.selectedIndex = i;
+                                                    break;
+                                                }
+                                            }
+
+                                             // Set ke input hidden agar bisa dikirim ke server
+                                             daySelect.value = dayName;
+                                         }
+                                        }
+
+        dateInput.addEventListener('change', function () {
+            updateDayFromDate(this.value);
+        });
+
+        if (dateInput.value) {
+            updateDayFromDate(dateInput.value);
+        }
+    });
                             </script>
+
 
                             <div class="modal-footer">
                                 <button type="submit" class="inline-block px-8 py-2 mb-4 font-bold leading-normal text-center text-white align-middle transition-all ease-in bg-tosca border-0 rounded-lg shadow-md cursor-pointer text-xs tracking-tight-rem hover:shadow-xs hover:-translate-y-px active:opacity-85">Simpan</button>

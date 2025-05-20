@@ -98,10 +98,18 @@ class GuardController extends Controller {
             'name' => 'required',
             'birth_date' => 'required',
             'photo' => 'image|mimes:jpeg,png,jpg|max:1024',
-            'phone_number' => 'required',
+            'phone_number' => 'required|min:11|max:15|regex:/^[0-9]+$/',
             'address' => 'required',
         ];
-        $validatedData = $request->validate($rules);
+        $validatedData = $request->validate($rules, [
+            'name.required' => 'Nama harus diisi',
+            'birth_date.required' => 'Tanggal Lahir harus diisi',
+            'phone_number.required' => 'Nomor Telepon harus diisi',
+            'phone_number.min' => 'Nomor Telepon harus memiliki minimal 10 digit',
+            'phone_number.max' => 'Nomor Telepon maksimal 13 digit',
+            'phone_number.regex' => 'Nomor Telepon hanya boleh berisi angka',
+            'address.required' => 'Alamat harus diisi',
+        ]);
 
         // if ($request->file('photo')) {
         //     if ($guard->photo) {
