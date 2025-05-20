@@ -11,10 +11,23 @@
 
                             <div class="w-full max-w-full px-3 shrink-0 md:w-full md:flex-0">
                                 <div class="mb-4">
-                                    <label for="date" class="inline-block mb-2 ml-1 font-bold text-xs text-slate-700 dark:text-white/80">Tanggal</label>
-                                    <input type="date" name="date" id="date" value="{{ old('date') }}"
-                                        class="form-control @error('date') is-invalid @enderror focus:shadow-primary-outline dark:bg-slate-850 dark:text-white text-sm leading-5.6 ease block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding px-3 py-2 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:border-blue-500 focus:outline-none" />
-                                    @error('date')
+                                    <label for="start_date"
+                                        class="inline-block mb-2 ml-1 font-bold text-xs text-slate-700 dark:text-white/80">Tanggal Mulai</label>
+                                    <input type="date" name="start_date" id="start_date" value="{{ old('start_date') }}"
+                                        class="form-control @error('start_date') is-invalid @enderror focus:shadow-primary-outline dark:bg-slate-850 dark:text-white text-sm leading-5.6 ease block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding px-3 py-2 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:border-blue-500 focus:outline-none" />
+                                    @error('start_date')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+
+                            <div class="w-full max-w-full px-3 shrink-0 md:w-full md:flex-0">
+                                <div class="mb-4">
+                                    <label for="end_date"
+                                        class="inline-block mb-2 ml-1 font-bold text-xs text-slate-700 dark:text-white/80">Tanggal Selesai</label>
+                                    <input type="date" name="end_date" id="end_date" value="{{ old('end_date') }}"
+                                        class="form-control @error('end_date') is-invalid @enderror focus:shadow-primary-outline dark:bg-slate-850 dark:text-white text-sm leading-5.6 ease block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding px-3 py-2 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:border-blue-500 focus:outline-none" />
+                                    @error('end_date')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
@@ -44,9 +57,6 @@
                                     <select id="guard_id" name="guard_id"
                                         class="form-control @error('guard_id') is-invalid @enderror focus:shadow-primary-outline dark:bg-slate-850 dark:text-white text-sm leading-5.6 ease block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding px-3 py-2 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:border-blue-500 focus:outline-none">
                                         <option value="" selected disabled>Pilih Nama</option>
-                                        {{-- @foreach ($guards as $guard)
-                                            <option value="{{ $guard->id }}">{{ $guard->name }}</option>
-                                        @endforeach --}}
                                     </select>
                                     @error('guard_id')
                                         <div class="invalid-feedback">{{ $message }}</div>
@@ -81,15 +91,11 @@
         }
     
         function updateSatpamDropdown() {
-            const tanggal = getFormattedDate(document.getElementById('date').value);
+            const startDate = document.getElementById('start_date').value;
             const shift = document.getElementById('shift_id').value;
-            const dayName = getDayName(tanggal);
-
-            // console.log('Tanggal:', tanggal);
-            // console.log('Day Name:', dayName);
-            // console.log('Shift:', shift);
+            const dayName = getDayName(startDate);
     
-            if (tanggal && shift) {
+            if (startDate && shift) {
                 fetch('/get-guard', {
                     method: 'POST',
                     headers: {
@@ -100,7 +106,6 @@
                 })
                 .then(response => response.json())
                 .then(data => {
-                    // console.log('Response Data:', data);
                     const guardDropdown = document.getElementById('guard_id');
                     guardDropdown.innerHTML = '';
     
@@ -126,7 +131,7 @@
             }
         }
     
-        document.getElementById('date').addEventListener('change', updateSatpamDropdown);
+        document.getElementById('start_date').addEventListener('change', updateSatpamDropdown);
         document.getElementById('shift_id').addEventListener('change', updateSatpamDropdown);
     </script>    
 @endsection

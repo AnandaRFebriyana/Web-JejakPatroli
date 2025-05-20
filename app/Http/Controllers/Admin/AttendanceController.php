@@ -68,14 +68,43 @@ class AttendanceController extends Controller {
     public function store(AttendanceRequest $request) {
         $validatedData = $request->validated();
 
-        if (Attendance::where('date', $validatedData['date'])
+        // Get start and end dates
+        $startDate = Carbon::parse($validatedData['start_date']);
+        $endDate = Carbon::parse($validatedData['end_date']);
+        
+        // Array untuk mapping hari dalam bahasa Indonesia
+        $days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+        
+        // Check for existing attendances in the date range
+        $currentDate = $startDate->copy();
+        while ($currentDate <= $endDate) {
+            $dayName = $days[$currentDate->dayOfWeek];
+            
+            $existingAttendance = Attendance::where('date', $currentDate->format('Y-m-d'))
                 ->where('shift_id', $validatedData['shift_id'])
-                ->exists()) {
-            session()->flash('info', 'Presensi tersebut sudah dibuat!');
+                ->where('guard_id', $validatedData['guard_id'])
+                ->exists();
+
+            if ($existingAttendance) {
+                return redirect('/presence')->with('info', "Presensi untuk hari {$dayName} tanggal {$currentDate->format('d/m/Y')} sudah tersedia.");
+            }
+            
+            $currentDate->addDay();
         }
 
-        Attendance::create($validatedData);
-        return redirect('/presence')->with('success', 'Berhasil menambah data!');
+        // Create attendances for each day in the range
+        $currentDate = $startDate->copy();
+        while ($currentDate <= $endDate) {
+            Attendance::create([
+                'guard_id' => $validatedData['guard_id'],
+                'shift_id' => $validatedData['shift_id'],
+                'date' => $currentDate->format('Y-m-d')
+            ]);
+            
+            $currentDate->addDay();
+        }
+
+        return redirect('/presence')->with('success', 'Berhasil menambah data presensi!');
     }
 
     /**

@@ -19,18 +19,22 @@ class AttendanceRequest extends FormRequest {
      */
     public function rules(): array {
         return [
-            'date' => 'required|date',
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after_or_equal:start_date',
             'shift_id' => 'required',
-            'guard_id' => 'required',
+            'guard_id' => 'required'
         ];
     }
 
     public function messages(): array {
         return [
-            'date.required' => 'Tanggal harus diisi.',
-            'date.date' => 'Format tanggal tidak valid.',
-            'shift_id.required' => 'Pilih shift terlebih dahulu.',
-            'guard_id.required' => 'Pilih satpam terlebih dahulu.',
+            'start_date.required' => 'Tanggal mulai harus diisi.',
+            'start_date.date' => 'Format tanggal mulai tidak valid.',
+            'end_date.required' => 'Tanggal selesai harus diisi.',
+            'end_date.date' => 'Format tanggal selesai tidak valid.',
+            'end_date.after_or_equal' => 'Tanggal selesai harus sama dengan atau setelah tanggal mulai.',
+            'shift_id.required' => 'Shift harus diisi.',
+            'guard_id.required' => 'Nama Satpam harus diisi.'
         ];
     }
 }
