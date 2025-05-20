@@ -1,48 +1,51 @@
 version: '3'
+
 services:
   app:
     build:
-      args:
-        user: laravel
-        uid: 1000
-      context: ./
+      context: .
       dockerfile: Dockerfile
-    image: jejakpatroli
-    container_name: jejakpatroli-app
+    container_name: jejakpatroli_app
     restart: unless-stopped
-    working_dir: /var/www/
     volumes:
-      - ./:/var/www
+      - .:/var/www
+      - ./docker/php/local.ini:/usr/local/etc/php/conf.d/local.ini
     networks:
-      - jejakpatroli
+      - app-network
+    depends_on:
+      - db
 
   db:
     image: mysql:8.0
-    container_name: jejakpatroli-db
+    container_name: jejakpatroli_db
     restart: unless-stopped
     environment:
       MYSQL_DATABASE: jejakpatroli
-      MYSQL_ROOT_PASSWORD: ''
-      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      MYSQL_ROOT_PASSWORD: ""
     volumes:
       - dbdata:/var/lib/mysql
     networks:
-      - jejakpatroli
+      - app-network
+    ports:
+      - "3306:3306"
 
   nginx:
-    image: nginx:1.21
-    container_name: jejakpatroli-nginx
+    image: nginx:1.25-alpine
+    container_name: jejakpatroli_nginx
     restart: unless-stopped
     ports:
-      - 80:80
+      - "80:80"
     volumes:
-      - ./:/var/www
-      - ./docker/nginx:/etc/nginx/conf.d
+      - .:/var/www
+      - ./docker/nginx/conf.d:/etc/nginx/conf.d
     networks:
-      - jejakpatroli
+      - app-network
+    depends_on:
+      - app
 
 networks:
-  jejakpatroli:
+  app-network:
     driver: bridge
 
 volumes:
