@@ -11,7 +11,7 @@
                             <!-- Button untuk modal shift -->
                             <button data-bs-toggle="modal" data-bs-target="#shiftScheduleModal"
                                 class="inline-block px-6 py-2 mb-4 mr-4 font-bold leading-normal text-center text-white align-middle transition-all ease-in bg-blue-500 border-0 rounded-lg shadow-md cursor-pointer text-xs tracking-tight-rem hover:shadow-xs hover:-translate-y-px active:opacity-85">
-                                <i class="fas fa-clock mr-2"></i>Jadwal Shift
+                                <i class="fas fa-clock mr-2"></i>Shift
                             </button>
                             <a href="/schedules/guard/create" 
                                 class="inline-block px-6 py-2 mb-4 ml-0 font-bold leading-normal text-center text-white align-middle transition-all ease-in bg-tosca border-0 rounded-lg shadow-md cursor-pointer text-xs tracking-tight-rem hover:shadow-xs hover:-translate-y-px active:opacity-85">
