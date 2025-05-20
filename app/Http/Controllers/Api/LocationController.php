@@ -10,17 +10,6 @@ use Illuminate\Support\Facades\Auth;
 
 class LocationController extends Controller
 {
-    public function index()
-    {
-        $guardId = Auth::guard('guard')->id();
-        $locations = Location::where('guard_id', $guardId)->get();
-        
-        return response()->json([
-            'status' => 'success',
-            'data' => $locations
-        ]);
-    }
-
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -46,36 +35,5 @@ class LocationController extends Controller
             'message' => 'Location recorded successfully',
             'data' => $location
         ], 201);
-    }
-
-    public function show($id)
-    {
-        $location = Location::with(['guardRelation'])->findOrFail($id);
-        
-        return response()->json([
-            'status' => 'success',
-            'data' => $location
-        ]);
-    }
-
-    public function getTrackingHistory(Request $request)
-    {
-        $request->validate([
-            'date' => 'nullable|date_format:Y-m-d'
-        ]);
-
-        $guardId = Auth::guard('guard')->id();
-        $query = TrackingLog::where('guard_id', $guardId);
-
-        if ($request->has('date')) {
-            $query->whereDate('created_at', $request->date);
-        }
-
-        $trackingLogs = $query->orderBy('created_at', 'desc')->get();
-
-        return response()->json([
-            'status' => 'success',
-            'data' => $trackingLogs
-        ]);
     }
 } 
