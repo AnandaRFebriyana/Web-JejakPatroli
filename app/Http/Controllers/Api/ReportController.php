@@ -36,10 +36,10 @@ class ReportController extends Controller {
 
     public function postReport(Request $request) {
         $validated = $request->validate([
-            'location_id' => 'required',
+            // 'location_id' => 'required', // HAPUS jika tidak perlu
             'status' => 'required',
             'description' => 'required|string|max:200',
-            'attachment.*' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+            'attachment.*' => 'file|mimes:jpeg,png,jpg,mp4,mov,avi|max:10240', // 10MB, gambar/video
         ]);
         $validated['guard_id'] = Auth::guard('guard')->id();
 
