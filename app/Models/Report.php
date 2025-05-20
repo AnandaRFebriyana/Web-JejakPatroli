@@ -13,8 +13,4 @@ class Report extends Model {
     public function guardRelation() {
         return $this->belongsTo(Guard::class, 'guard_id');
     }
-
-    public function location() {
-        return $this->belongsTo(Location::class);
-    }
 }
