@@ -8,6 +8,14 @@ use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller {
 
+    public function landingpage() {
+        return view("pages.landingpage");
+    }
+
+    public function landingabout() {
+        return view("pages.landingabout");
+    }
+
     public function signin() {
         return view("pages.auth.sign-in");
     }
@@ -28,6 +36,6 @@ class AuthController extends Controller {
 
     public function logout() {
         Auth::guard('admin')->logout();
-        return redirect('/');
+        return redirect('/login');
     }
 }

@@ -10,9 +10,10 @@ use App\Http\Controllers\Admin\ReportController;
 
 use Illuminate\Support\Facades\Route;
 
-
-Route::get("/", [AuthController::class, 'signin'])->name('sign-in');
-Route::post("/", [AuthController::class, 'authenticate']);
+Route::get("/", [AuthController::class, 'landingpage'])->name('landingpage');
+Route::get("/aboutus", [AuthController::class, 'landingabout'])->name('landingabout');
+Route::get("/login", [AuthController::class, 'signin'])->name('sign-in');
+Route::post("/login", [AuthController::class, 'authenticate']);
 Route::post("/logout", [AuthController::class, 'logout']);
 
 Route::middleware('auth:admin')->group(function (){

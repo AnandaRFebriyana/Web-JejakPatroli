@@ -24,6 +24,14 @@
         <div class="w-full max-w-full px-3 flex-0"></div>
     </div>
 </div>
+<a href="/" class="fixed top-6 left-8 flex items-center text-gray-700 hover:text-gray-900 transition-colors z-50">
+    <svg class="w-5 h-5 mr-2 font-bold" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"
+        xmlns="http://www.w3.org/2000/svg">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path>
+    </svg>
+    <span class="text-base font-semibold">Kembali</span>
+</a>
+
 <main class="mt-0 transition-all duration-200 ease-in-out">
     <section>
         <div class="relative flex items-center min-h-screen p-0 overflow-hidden bg-center bg-cover">
@@ -44,7 +52,7 @@
                                 <p class="mb-0">Masukkan Email dan Password anda untuk masuk</p>
                             </div>
                             <div class="flex-auto p-6">
-                                <form action="/" method="POST">
+                                <form action="/login" method="POST">
                                     @csrf
                                     <div class="mb-4">
                                         <input type="email" id="email" name="email" value="{{ old('email') }}" placeholder="Email" autofocus
