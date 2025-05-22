@@ -46,7 +46,11 @@ class ReportController extends Controller {
         if ($request->hasFile('attachment')) {
             $attachments = [];
             foreach ($request->file('attachment') as $file) {
-                $attachments[] = $file->store('report-attachments', 'public');
+                // Generate nama file yang unik
+                $filename = uniqid() . '.' . $file->getClientOriginalExtension();
+                // Simpan file dengan nama yang unik
+                $path = $file->storeAs('report-attachments', $filename, 'public');
+                $attachments[] = $path;
             }
             $validated['attachment'] = json_encode($attachments);
         }
