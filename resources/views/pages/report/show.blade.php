@@ -26,20 +26,27 @@
                 </div>
                 <div class="mb-2 text-sm leading-tight dark:text-white/80">
                     <span class="font-semibold text-slate-700 dark:text-white">Lampiran:</span>
-                    @if($report->media_path)
-                        @if(Str::endsWith(strtolower($report->media_path), ['.jpg', '.jpeg', '.png', '.gif']))
-                            <img src="{{ asset('storage/' . $report->media_path) }}" alt="Lampiran" style="max-width:200px;">
-                        @elseif(Str::endsWith(strtolower($report->media_path), ['.mp4', '.mov', '.avi']))
-                            <video controls style="max-width:200px;">
-                                <source src="{{ asset('storage/' . $report->media_path) }}" type="video/mp4">
-                                Browser tidak mendukung video.
-                            </video>
-                        @endif
+                    @php
+                        $attachments = json_decode($report->attachment, true);
+                    @endphp
+
+                    @if($attachments && count($attachments) > 0)
+                        <div style="display: flex; flex-direction: column; gap: 16px; margin-top: 8px;">
+                            @foreach($attachments as $file)
+                                @if(Str::endsWith(strtolower($file), ['.jpg', '.jpeg', '.png', '.gif']))
+                                    <img src="{{ asset('storage/' . $file) }}" alt="Lampiran" style="max-width:200px; border-radius: 8px;">
+                                @elseif(Str::endsWith(strtolower($file), ['.mp4', '.mov', '.avi']))
+                                    <video controls style="max-width:200px; border-radius: 8px;">
+                                        <source src="{{ asset('storage/' . $file) }}" type="video/mp4">
+                                        Browser tidak mendukung video.
+                                    </video>
+                                @endif
+                            @endforeach
+                        </div>
+                    @else
+                        <span class="text-slate-500">Tidak ada lampiran.</span>
                     @endif
                 </div>
-
-                <pre>{{ $report->media_path }}</pre>
-                <pre>{{ asset('storage/' . $report->media_path) }}</pre>
 
                 {{-- <div class="mb-2 text-sm leading-tight dark:text-white/80">
                     <span class="font-semibold text-slate-700 dark:text-white">Lampiran:</span>
