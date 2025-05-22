@@ -13,10 +13,7 @@
                   <span class="font-semibold text-slate-700 dark:text-white">Nama:</span>
                   <span class="text-slate-700 dark:text-white">{{ $report->guardRelation->name }}</span>
                 </div>
-                <div class="mb-2 text-sm leading-tight dark:text-white/80">
-                  <span class="font-semibold text-slate-700 dark:text-white">Lokasi:</span>
-                  <span class="text-slate-700 dark:text-white">{{ $report->location->location_name }}</span>
-                </div>
+
                 <div class="text-sm leading-tight dark:text-white/80 mb-2">
                   <span class="font-semibold text-slate-700 dark:text-white">Status:</span>
                   <span class="text-slate-700 dark:text-white sm:ml-2" style="background-color: {{ $report->status == 'Aman' ? 'green' : 'red' }}; padding: 2px 4px; border-radius: 4px; color: white;">
@@ -29,27 +26,20 @@
                 </div>
                 <div class="mb-2 text-sm leading-tight dark:text-white/80">
                     <span class="font-semibold text-slate-700 dark:text-white">Lampiran:</span>
-                    <div class="mt-3 flex flex-wrap">
-                        @php
-                            $rawAttachment = $report->attachment;
-                            $attachments = [];
-
-                            if (!empty($rawAttachment)) {
-                                $attachments = [$rawAttachment];
-                            }
-                        @endphp
-
-                        @forelse ($attachments as $attachment)
-                            <div class="max-w-1/3 p-2">
-                                <img src="{{ asset('storage/' . $attachment) }}" alt="Lampiran" class="max-w-64 h-auto rounded-lg" />
-                            </div>
-                        @empty
-                            <p class="text-slate-500 dark:text-white/50">Tidak ada lampiran tersedia.</p>
-                        @endforelse
-                    </div>
+                    @if($report->media_path)
+                        @if(Str::endsWith(strtolower($report->media_path), ['.jpg', '.jpeg', '.png', '.gif']))
+                            <img src="{{ asset('storage/' . $report->media_path) }}" alt="Lampiran" style="max-width:200px;">
+                        @elseif(Str::endsWith(strtolower($report->media_path), ['.mp4', '.mov', '.avi']))
+                            <video controls style="max-width:200px;">
+                                <source src="{{ asset('storage/' . $report->media_path) }}" type="video/mp4">
+                                Browser tidak mendukung video.
+                            </video>
+                        @endif
+                    @endif
                 </div>
 
-
+                <pre>{{ $report->media_path }}</pre>
+                <pre>{{ asset('storage/' . $report->media_path) }}</pre>
 
                 {{-- <div class="mb-2 text-sm leading-tight dark:text-white/80">
                     <span class="font-semibold text-slate-700 dark:text-white">Lampiran:</span>

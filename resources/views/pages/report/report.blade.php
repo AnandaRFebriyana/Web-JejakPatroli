@@ -2,56 +2,89 @@
 
 @section('content')
         <div class="flex flex-wrap -mx-3">
-          <div class="w-full max-w-full px-3  md:flex-none">
+          <div class="w-full max-w-full px-3 md:flex-none">
             <div class="relative flex flex-col min-w-0 break-words bg-white border-0 shadow-xl dark:bg-slate-850 dark:shadow-dark-xl rounded-2xl bg-clip-border">
-              <div class="flex-auto p-5 pt-7">
+              <div class="flex-auto p-6">
                 <div class="flex flex-wrap -mx-3">
                   @foreach ($reports as $report)
                   <div class="w-full md:w-1/2 px-3 mb-6">
-                    <div class="relative flex flex-col p-4 bg-white border-0 shadow-xl dark:bg-slate-850 dark:shadow-dark-xl rounded-2xl bg-clip-border">
-                      <div class="flex justify-between items-center">
-                        <div class="flex-auto">
-                          <div class="mb-2 text-sm leading-tight dark:text-white/80">
-                            <span class="font-semibold text-slate-700 dark:text-white">Nama:</span>
-                            <span class="text-slate-700 dark:text-white">{{ $report->guardRelation->name }}</span>
+                    <a href="/report/{{ $report->id }}" class="block">
+                      <div class="relative flex flex-col p-6 bg-white border-0 shadow-xl dark:bg-slate-850 dark:shadow-dark-xl rounded-2xl bg-clip-border hover:shadow-2xl transition-all duration-300 cursor-pointer transform hover:-translate-y-1">
+                        <!-- Header with Name and Time -->
+                        <div class="flex justify-between items-start mb-4">
+                          <div class="flex items-center">
+                            <div class="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center mr-3">
+                              <i class="fas fa-user text-slate-600 dark:text-white"></i>
+                            </div>
+                            <div>
+                              <h6 class="text-base font-semibold text-slate-700 dark:text-white mb-1">{{ $report->guardRelation->name }}</h6>
+                              <p class="text-xs text-slate-500 dark:text-slate-400">
+                                {{ \Carbon\Carbon::parse($report->created_at)->translatedFormat('d F Y') }} • {{ $report->created_at->format('H:i:s') }}
+                              </p>
+                            </div>
                           </div>
-                          <div class="mb-2 text-sm leading-tight dark:text-white/80">
-                            <span class="font-semibold text-slate-700 dark:text-white">Lokasi:</span>
-                            <span class="text-slate-700 dark:text-white">{{ $report->location->location_name }}</span>
-                          </div>
-                          <div class="text-sm leading-tight dark:text-white/80">
-                            <span class="font-semibold text-slate-700 dark:text-white">Status:</span>
-                            <span class="text-slate-700 dark:text-white sm:ml-2" style="background-color: {{ $report->status == 'Aman' ? 'green' : 'red' }}; padding: 2px 4px; border-radius: 4px; color: white;">
+                          <div class="px-3 py-1 rounded-full" style="background-color: {{ $report->status == 'Aman' ? '#10B981' : '#EF4444' }}20">
+                            <span class="text-sm font-medium" style="color: {{ $report->status == 'Aman' ? '#10B981' : '#EF4444' }}">
                               {{ $report->status }}
                             </span>
                           </div>
                         </div>
-                        <div class="text-right">
-                          <h7 class="text-md leading-normal dark:text-white">{{ \Carbon\Carbon::parse($report->created_at)->translatedFormat('d F Y') }}</h7>
-                          <span class="text-sm leading-tight dark:text-white/80">{{ $report->created_at->format('H:i:s') }}</span>
+
+                        <!-- Description Preview -->
+                        <div class="mb-4">
+                          <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed line-clamp-2">
+                            {{ $report->description }}
+                          </p>
+                        </div>
+
+                        <!-- Media Preview -->
+                        @if($report->media_path)
+                        <div class="mb-4">
+                          <div class="rounded-xl overflow-hidden">
+                            @if(Str::endsWith(strtolower($report->media_path), ['.jpg', '.jpeg', '.png', '.gif']))
+                              <img src="{{ asset('storage/' . $report->media_path) }}"
+                                   alt="Report Image"
+                                   class="w-full h-48 object-cover hover:scale-105 transition-transform duration-300">
+                            @elseif(Str::endsWith(strtolower($report->media_path), ['.mp4', '.mov', '.avi']))
+                              <div class="relative w-full h-48 bg-slate-200 dark:bg-slate-700 rounded-xl overflow-hidden">
+                                <video class="w-full h-full object-cover">
+                                  <source src="{{ asset('storage/' . $report->media_path) }}" type="video/mp4">
+                                </video>
+                                <div class="absolute inset-0 flex items-center justify-center">
+                                  <i class="fas fa-play-circle text-4xl text-white opacity-75"></i>
+                                </div>
+                              </div>
+                            @endif
+                          </div>
+                        </div>
+                        @endif
+
+                        <!-- View Detail Indicator -->
+                        <div class="flex justify-end items-center mt-4 pt-4 border-t border-slate-200 dark:border-slate-700">
+                          <span class="text-sm text-blue-600 dark:text-blue-400 flex items-center">
+                            Lihat Detail
+                            <i class="fas fa-chevron-right ml-2"></i>
+                          </span>
                         </div>
                       </div>
-                      <div class="flex justify-end mt-4">
-                        <a href="/report/{{ $report->id }}"
-                           class="inline-block dark:text-white px-4 py-2.5 mb-0 font-bold text-center align-middle transition-all bg-transparent border-0 rounded-lg shadow-none cursor-pointer leading-normal text-sm ease-in bg-150 hover:-translate-y-px active:opacity-85 bg-x-25 text-slate-700">
-                           <i class="mr-2 fas fa-eye text-slate-700" aria-hidden="true"></i>Lihat Detail
-                        </a>
-                      </div>
-                    </div>
+                    </a>
                   </div>
                   @endforeach
                 </div>
-                <div class="flex justify-between px-6">
-                  <div class="mt-3 text-xs text-gray-700">
-                      Showing
-                      {{ $reports->firstItem() }}
-                      to
-                      {{ $reports->lastItem() }}
-                      of
-                      {{ $reports->total() }}
+
+                <!-- Pagination -->
+                <div class="flex justify-between items-center mt-6 px-4">
+                  <div class="text-sm text-slate-600 dark:text-slate-400">
+                    Showing
+                    <span class="font-medium">{{ $reports->firstItem() }}</span>
+                    to
+                    <span class="font-medium">{{ $reports->lastItem() }}</span>
+                    of
+                    <span class="font-medium">{{ $reports->total() }}</span>
+                    results
                   </div>
                   <div class="mt-1">
-                      {{ $reports->links() }}
+                    {{ $reports->links() }}
                   </div>
                 </div>
               </div>
