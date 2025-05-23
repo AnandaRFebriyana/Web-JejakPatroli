@@ -38,7 +38,7 @@
                                         <option value="">Pilih Shift</option>
                                         @foreach ($shifts as $shift)
                                             <option value="{{ $shift->id }}" {{ $schedule->shift_id == $shift->id ? 'selected' : '' }}>
-                                                {{ $shift->start_time }} - {{ $shift->end_time }}
+                                                {{ $shift->shift_name }}
                                             </option>
                                         @endforeach
                                     </select>

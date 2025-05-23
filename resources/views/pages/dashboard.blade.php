@@ -111,20 +111,26 @@
       <div class="relative flex flex-col min-w-0 break-words bg-white border-0 border-solid shadow-xl dark:bg-slate-850 dark:shadow-dark-xl dark:bg-gray-950 border-black-125 rounded-2xl bg-clip-border">
 
         <div class="p-4 pb-0 rounded-t-4">
-          <div class="flex justify-between">
-            <h6 class="dark:text-white">Data Izin Satpam</h6>
-          </div>
-          <div class="flex flex-wrap justify-end">
-            <div class="mb-4 mx-4 flex flex-col relative">
-                <label for="start-date" class="inline-block mb-2 ml-1 font-bold text-xs text-slate-700 dark:text-white/80">Tanggal Mulai</label>
-                <input type="date" id="start-date" name="start-date" class="focus:shadow-primary-outline dark:bg-slate-850 dark:text-white text-sm leading-5.6 ease block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding px-3 py-2 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:border-blue-500 focus:outline-none" style="max-width: 250px;">
-            </div>
-            <div class="mb-4 mx-4 flex flex-col relative">
-                <label for="end-date" class="inline-block mb-2 ml-1 font-bold text-xs text-slate-700 dark:text-white/80">Tanggal Akhir</label>
-                <input type="date" id="end-date" name="end-date" class="focus:shadow-primary-outline dark:bg-slate-850 dark:text-white text-sm leading-5.6 ease block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding px-3 py-2 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:border-blue-500 focus:outline-none" style="max-width: 250px;">
-            </div>
-            <div class="mb-4 mx-4 flex flex-col relative">
-              <button id="filter-button" class="inline-block px-8 py-2 mb-4 font-bold leading-normal text-center text-white align-middle transition-all ease-in bg-tosca border-0 rounded-lg shadow-md cursor-pointer text-xs tracking-tight-rem hover:shadow-xs hover:-translate-y-px active:opacity-85">Filter</button>
+          <div class="flex flex-col">
+            <h6 class="dark:text-white mb-2">Data Izin Satpam</h6>
+            <div class="flex flex-row items-end justify-between mb-4">
+                <!-- KIRI: Input Cari & Tombol Cari -->
+                <div class="flex flex-row items-end">
+                    <input type="text" id="search-permit" name="search-permit" placeholder="Cari nama satpam..." class="focus:shadow-primary-outline dark:bg-slate-850 dark:text-white text-sm leading-5.6 rounded-lg border border-gray-300 bg-white px-3 py-2 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:border-blue-500 focus:outline-none mr-2" style="max-width: 200px;">
+                    <button id="search-permit-button" class="px-4 py-2 font-bold text-white bg-blue-500 rounded hover:bg-blue-600">Cari</button>
+                </div>
+                <!-- KANAN: Tanggal Mulai, Tanggal Akhir, Tombol Filter -->
+                <div class="flex flex-row items-end">
+                    <div class="flex flex-col mr-2">
+                        <label for="start-date" class="inline-block mb-1 font-bold text-xs text-slate-700 dark:text-white/80">Tanggal Mulai</label>
+                        <input type="date" id="start-date" name="start-date" class="focus:shadow-primary-outline dark:bg-slate-850 dark:text-white text-sm leading-5.6 rounded-lg border border-gray-300 bg-white px-3 py-2 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:border-blue-500 focus:outline-none" style="max-width: 150px;">
+                    </div>
+                    <div class="flex flex-col mr-2">
+                        <label for="end-date" class="inline-block mb-1 font-bold text-xs text-slate-700 dark:text-white/80">Tanggal Akhir</label>
+                        <input type="date" id="end-date" name="end-date" class="focus:shadow-primary-outline dark:bg-slate-850 dark:text-white text-sm leading-5.6 rounded-lg border border-gray-300 bg-white px-3 py-2 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:border-blue-500 focus:outline-none" style="max-width: 150px;">
+                    </div>
+                    <button id="filter-button" class="px-8 py-2 font-bold leading-normal text-center text-white align-middle transition-all ease-in bg-tosca border-0 rounded-lg shadow-md cursor-pointer text-xs tracking-tight-rem hover:shadow-xs hover:-translate-y-px active:opacity-85 ml-2">Filter</button>
+                </div>
             </div>
           </div>
         </div>
@@ -251,6 +257,35 @@ document.getElementById('filter-button').addEventListener('click', function() {
     .catch(error => {
         console.error('Error:', error);
     });
+});
+
+document.getElementById('search-permit-button').addEventListener('click', function(e) {
+    e.preventDefault();
+    const searchValue = document.getElementById('search-permit').value.toLowerCase();
+    const tableBody = document.getElementById('data-table-body');
+    const rows = tableBody.getElementsByTagName('tr');
+
+    for (let i = 0; i < rows.length; i++) {
+        const nameCell = rows[i].getElementsByTagName('td')[1]; // kolom Nama Satpam
+        if (nameCell) {
+            const nameText = nameCell.textContent.toLowerCase();
+            if (nameText.includes(searchValue)) {
+                rows[i].style.display = '';
+            } else {
+                rows[i].style.display = 'none';
+            }
+        }
+    }
+});
+
+document.getElementById('search-permit').addEventListener('input', function() {
+    if (this.value === '') {
+        const tableBody = document.getElementById('data-table-body');
+        const rows = tableBody.getElementsByTagName('tr');
+        for (let i = 0; i < rows.length; i++) {
+            rows[i].style.display = '';
+        }
+    }
 });
 </script>
 @endsection
