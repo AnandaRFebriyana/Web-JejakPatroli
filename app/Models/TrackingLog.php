@@ -13,7 +13,8 @@ class TrackingLog extends Model
         'guard_id',
         'latitude',
         'longitude',
-        'created_at'
+        'created_at',
+        'updated_at'
     ];
 
     public function guardRelation()

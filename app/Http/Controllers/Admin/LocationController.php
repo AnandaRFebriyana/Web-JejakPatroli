@@ -15,15 +15,24 @@ class LocationController extends Controller {
     public function index() {
         $title = 'Delete!';
         $text = "Are you sure you want to delete?";
+        $location = Location::with('guardRelation')->get();
         $logs = TrackingLog::with(['guardRelation.schedules'])->get();
         confirmDelete($title, $text);
+        $location = Location::with('guardRelation')->orderBy('created_at', 'desc')->first();
 
         return view('pages.location.location', [
-            'title'=> 'Data Lokasi Patroli',
-            'locations' => Location::all(),
-            'logs' => $logs
+            'logs' => $logs,
+            'location' => $location,
+            'title' => 'Data Lokasi Patroli',
         ]);
     }
+
+    public function loctrack() {
+        return view('pages.location.locationtrack', [
+            'title' => 'Tracking Lokasi Satpam'
+        ]);
+    }
+
 
     /**
      * Show the form for creating a new resource.
@@ -54,6 +63,13 @@ class LocationController extends Controller {
      */
     public function show(Location $location) {
         return redirect()->away("https://www.google.com/maps?q={$location->latitude},{$location->longitude}");
+    }
+
+    public function showtrack(Location $location) {
+        return view('pages.location.locationtrack', [
+            'title' => 'Tracking Lokasi Satpam',
+            'location' => $location,
+        ]);
     }
 
     /**

@@ -30,6 +30,9 @@ Route::middleware('auth:admin')->group(function (){
     Route::resource('/presence', AttendanceController::class);
     Route::post('/get-guard', [AttendanceController::class, 'getSatpam']);
 
+
+    Route::get('/location/tracking', [LocationController::class, 'loctrack'])->name('location.tracking');
+    Route::get('/location/tracking/{location}', [LocationController::class, 'showtrack'])->name('location.showtrack');
     Route::resource('/location', LocationController::class)->only('index','show');
     Route::resource('/report', ReportController::class);
 

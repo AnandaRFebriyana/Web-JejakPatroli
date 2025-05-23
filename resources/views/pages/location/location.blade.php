@@ -8,7 +8,7 @@
       <div class="p-6 pb-0 mb-0 border-b-0 border-b-solid rounded-t-2xl border-b-transparent">
         <h6 class="dark:text-white">Tracking Patroli Satpam</h6>
         <h6 class="dark:text-white">Data Tracking</h6>
-        
+
         <div class="flex md:pr-4">
           <div class="relative flex flex-wrap items-stretch transition-all rounded-lg ease">
             <span class="text-sm ease leading-5.6 absolute z-50 -ml-px flex h-full items-center whitespace-nowrap rounded-lg rounded-tr-none rounded-br-none border border-r-0 border-transparent bg-transparent py-2 px-2.5 text-center font-normal text-slate-500 transition-all">
@@ -20,40 +20,36 @@
       </div>
       <div class="flex-auto px-0 pt-0 pb-2">
         <div class="p-0 overflow-x-auto">
-          <table class="items-center w-full mb-0 align-top border-collapse dark:border-white/40 text-slate-500">
-            <thead class="align-bottom">
-              <tr>
-                <th class="px-6 py-3 font-bold text-center uppercase align-middle bg-transparent border-b border-collapse shadow-none text-xxs border-b-solid tracking-none whitespace-nowrap">No</th>
-                <th class="px-6 py-3 font-bold text-center uppercase align-middle bg-transparent border-b border-collapse shadow-none text-xxs border-b-solid tracking-none whitespace-nowrap">Nama Satpam</th>
-                <th class="px-6 py-3 font-bold text-center uppercase text-xxs">Tanggal</th>
-                {{-- <th class="px-6 py-3 font-bold text-center uppercase text-xxs">Check In</th>
-                <th class="px-6 py-3 font-bold text-center uppercase text-xxs">Check Out</th> --}}
-                <th class="px-6 py-3 font-bold text-center uppercase text-xxs">Aksi</th>
-              </tr>
-            </thead>
-            <tbody>
-                {{-- <pre>{{ dd($logs) }}</pre> --}}
-
-              @foreach ($logs as $index => $log)
-              <tr class="location-row">
-                <td class="p-2 text-center">{{ $index + 1 }}</td>
-                <td class="p-2 text-center">{{ $log->guardRelation->name }}</td>
-                <td class="p-2 text-center">{{ \Carbon\Carbon::parse($log->created_at)->format('Y-m-d') }}</td>
-                {{-- <td class="p-2 text-center">{{ $log->check_in }}</td>
-                <td class="p-2 text-center">{{ $log->check_out }}</td> --}}
-                <td class="p-2 text-center">
-                  <!-- Tombol Show Tracking -->
-                  <a class="text-xs text-green-500">
-                    <i class="fas fa-map-marked-alt"></i> Show Tracking
-                  </a>
-                  {{-- <a href="{{ route('location.show', $location->id) }}" class="text-xs text-green-500">
-                    <i class="fas fa-map-marked-alt"></i> Show Tracking
-                  </a> --}}
-                </td>
-              </tr>
-              @endforeach
-            </tbody>
-          </table>
+            <table class="items-center w-full mb-0 align-top border-collapse dark:border-white/40 text-slate-500">
+                <thead class="align-bottom">
+                  <tr>
+                    <th class="px-6 py-3 font-bold text-center uppercase align-middle bg-transparent border-b border-collapse shadow-none text-xxs border-b-solid tracking-none whitespace-nowrap">No</th>
+                    <th class="px-6 py-3 font-bold text-center uppercase align-middle bg-transparent border-b border-collapse shadow-none text-xxs border-b-solid tracking-none whitespace-nowrap">Nama Satpam</th>
+                    <th class="px-6 py-3 font-bold text-center uppercase align-middle bg-transparent border-b border-collapse shadow-none text-xxs border-b-solid tracking-none whitespace-nowrap">Tanggal</th>
+                    <th class="px-6 py-3 font-bold text-center uppercase align-middle bg-transparent border-b border-collapse shadow-none text-xxs border-b-solid tracking-none whitespace-nowrap">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody>
+                    @if ($location)
+                      <tr class="border-b border-gray-200 dark:border-gray-700">
+                        <td class="p-3 text-center">1</td>
+                        <td class="p-3 text-center">
+                            {{ $location->guardRelation ? $location->guardRelation->name : 'Tidak ditemukan' }}
+                        </td>
+                        <td class="p-3 text-center">{{ \Carbon\Carbon::parse($location->created_at)->format('Y-m-d') }}</td>
+                        <td class="p-3 text-center">
+                          <a href="{{ route('location.showtrack', ['location' => $location->id]) }}" class="inline-flex items-center px-3 py-1 text-xs font-medium text-xxx bg-green-500 rounded hover:bg-green-600">
+                            <i class="fas fa-map-marked-alt mr-1"></i> Tampilkan Tracking
+                          </a>
+                        </td>
+                      </tr>
+                    @else
+                      <tr>
+                        <td colspan="4" class="text-center">Data lokasi tidak ditemukan</td>
+                      </tr>
+                    @endif
+                  </tbody>
+              </table>
           @include('pages.location.edit')
         </div>
       </div>
