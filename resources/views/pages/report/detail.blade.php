@@ -33,7 +33,7 @@
                             </div>
                         </div>
 
-                   
+
 
                         <!-- Time Information -->
                         <div class="bg-slate-50 dark:bg-slate-800 rounded-xl p-6">
@@ -72,22 +72,31 @@
                         </div>
 
                         <!-- Media Section -->
-                        @if($report->media_path)
-                        <div class="bg-slate-50 dark:bg-slate-800 rounded-xl p-6">
-                            <h6 class="text-lg font-semibold text-slate-700 dark:text-white mb-4">Dokumentasi</h6>
-                            <div class="rounded-xl overflow-hidden">
-                                @if(Str::endsWith(strtolower($report->media_path), ['.jpg', '.jpeg', '.png', '.gif']))
-                                    <img src="{{ asset('storage/' . $report->media_path) }}"
-                                         alt="Report Image"
-                                         class="w-full h-96 object-cover">
-                                @elseif(Str::endsWith(strtolower($report->media_path), ['.mp4', '.mov', '.avi']))
-                                    <video controls class="w-full h-96 object-cover">
-                                        <source src="{{ asset('storage/' . $report->media_path) }}" type="video/mp4">
-                                        Your browser does not support the video tag.
-                                    </video>
-                                @endif
+                        @php
+                            $attachments = json_decode($report->attachment, true);
+                        @endphp
+
+                        @if($attachments && count($attachments) > 0)
+                            @foreach($attachments as $file)
+                                <div class="bg-slate-50 dark:bg-slate-800 rounded-xl p-6">
+                                    <h6 class="text-lg font-semibold text-slate-700 dark:text-white mb-4">Dokumentasi</h6>
+                                    <div class="rounded-xl overflow-hidden">
+                                        @if(Str::endsWith(strtolower($file), ['.jpg', '.jpeg', '.png', '.gif']))
+                                            <img src="{{ asset('storage/' . $file) }}" alt="Lampiran" style="max-width:200px;">
+                                        @elseif(Str::endsWith(strtolower($file), ['.mp4', '.mov', '.avi']))
+                                            <video controls style="max-width:200px;">
+                                                <source src="{{ asset('storage/' . $file) }}" type="video/mp4">
+                                                Browser tidak mendukung video.
+                                            </video>
+                                        @endif
+                                    </div>
+                                </div>
+                            @endforeach
+                        @else
+                            <div class="bg-slate-50 dark:bg-slate-800 rounded-xl p-6">
+                                <h6 class="text-lg font-semibold text-slate-700 dark:text-white mb-4">Dokumentasi</h6>
+                                <span class="text-slate-500">Tidak ada lampiran.</span>
                             </div>
-                        </div>
                         @endif
                     </div>
                 </div>
@@ -95,4 +104,7 @@
         </div>
     </div>
 </div>
+
+<pre>media_path: {{ $report->media_path }}</pre>
+<pre>asset: {{ asset('storage/' . $report->media_path) }}</pre>
 @endsection
