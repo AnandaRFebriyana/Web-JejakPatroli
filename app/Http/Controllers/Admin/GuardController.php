@@ -75,7 +75,7 @@ class GuardController extends Controller {
 
     /**
      * Display the specified resource.
-     */
+
     public function show(Guard $guard) {
 
     }
@@ -163,7 +163,7 @@ class GuardController extends Controller {
         $validatedData = $request->validate($rules, [
             'password.required' => 'Password harus di isi',
             'password.min' => 'Password harus memiliki minimal :min karakter.',
-            'password.regex' => 'Password harus mengandung setidaknya satu angka dan satu simbol.',
+            'password.regex' => 'Password harus mengandung angka atau simbol.',
             'password.confirmed' => 'Konfirmasi password tidak cocok.',
         ]);
 

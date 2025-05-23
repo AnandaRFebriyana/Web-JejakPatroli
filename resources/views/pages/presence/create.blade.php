@@ -32,7 +32,7 @@
                                     @enderror
                                 </div>
                             </div>
-                            
+
                             <div class="w-full max-w-full px-3 shrink-0 md:w-full md:flex-0">
                                 <div class="mb-4">
                                     <label for="shift_id"
@@ -41,7 +41,7 @@
                                         class="form-control @error('shift_id') is-invalid @enderror focus:shadow-primary-outline dark:bg-slate-850 dark:text-white text-sm leading-5.6 ease block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding px-3 py-2 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:border-blue-500 focus:outline-none">
                                         <option value="" selected disabled>Pilih Shift</option>
                                         @foreach ($shifts as $shift)
-                                            <option value="{{ $shift->id }}">{{ $shift->start_time }} - {{ $shift->end_time }}</option>
+                                            <option value="{{ $shift->id }}">{{ $shift->shift_name }} </option>
                                         @endforeach
                                     </select>
                                     @error('shift_id')
@@ -83,18 +83,18 @@
             const year = d.getFullYear();
             return `${year}-${month}-${day}`;
         }
-    
+
         function getDayName(dateStr) {
             const date = new Date(dateStr);
             const options = { weekday: 'long' };
             return new Intl.DateTimeFormat('id-ID', options).format(date);
         }
-    
+
         function updateSatpamDropdown() {
             const startDate = document.getElementById('start_date').value;
             const shift = document.getElementById('shift_id').value;
             const dayName = getDayName(startDate);
-    
+
             if (startDate && shift) {
                 fetch('/get-guard', {
                     method: 'POST',
@@ -108,14 +108,14 @@
                 .then(data => {
                     const guardDropdown = document.getElementById('guard_id');
                     guardDropdown.innerHTML = '';
-    
+
                     data.guardOnShift.forEach(guard => {
                         const option = document.createElement('option');
                         option.value = guard.id;
                         option.textContent = guard.name;
                         guardDropdown.appendChild(option);
                     });
-    
+
                     data.allGuard.forEach(guard => {
                         if (!data.guardOnShift.find(item => item.id === guard.id)) {
                             const option = document.createElement('option');
@@ -130,8 +130,8 @@
                 });
             }
         }
-    
+
         document.getElementById('start_date').addEventListener('change', updateSatpamDropdown);
         document.getElementById('shift_id').addEventListener('change', updateSatpamDropdown);
-    </script>    
+    </script>
 @endsection

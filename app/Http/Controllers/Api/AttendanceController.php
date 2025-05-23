@@ -19,7 +19,7 @@ class AttendanceController extends Controller {
         $guardId = Auth::guard('guard')->id();
         $attendances = Attendance::where('guard_id', $guardId)
                                   ->whereNotNull('check_in_time')
-                                  ->whereNotNull('check_out_time')
+                                //   ->whereNotNull('check_out_time')
                                   ->whereNotNull('status')
                                   ->orderBy('updated_at', 'desc')
                                   ->get();
@@ -63,6 +63,9 @@ class AttendanceController extends Controller {
         $status = 'Hadir';
         if ($check_in->gt($late_threshold)) {
             $status = 'Terlambat';
+        }
+        if ($check_in->lt($shift_start)) {
+            return response()->json(['error' => 'Belum waktunya check-in!']);
         }
 
         $attendance->update([

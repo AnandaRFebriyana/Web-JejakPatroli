@@ -27,7 +27,7 @@ class ScheduleRequest extends FormRequest {
                 'end_date' => 'required|date|after_or_equal:start_date',
             ];
         }
-        
+
         // Jika ada schedule_date, berarti ini adalah update jadwal
         return [
             'guard_id' => 'required',
@@ -40,7 +40,7 @@ class ScheduleRequest extends FormRequest {
     public function messages(): array {
         return [
             'guard_id.required' => 'Nama Satpam harus diisi.',
-            'shift_id.required' => 'Shift harus diisi.',
+            'shift_id.required' => 'Shift harus diis.',
             'day.required' => 'Hari harus diisi.',
             'schedule_date.required' => 'Tanggal jadwal harus diisi.',
             'schedule_date.date' => 'Format tanggal tidak valid.',
