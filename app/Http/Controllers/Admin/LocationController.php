@@ -28,11 +28,16 @@ class LocationController extends Controller {
     }
 
     public function loctrack() {
+        $locations = Location::with('guardRelation')
+            ->orderBy('created_at', 'desc')
+            ->take(10)
+            ->get();
+
         return view('pages.location.locationtrack', [
-            'title' => 'Tracking Lokasi Satpam'
+            'title' => 'Tracking Lokasi Satpam',
+            'locations' => $locations,
         ]);
     }
-
 
     /**
      * Show the form for creating a new resource.
