@@ -29,6 +29,7 @@ Route::middleware('auth:admin')->group(function (){
 
     Route::resource('/presence', AttendanceController::class);
     Route::post('/get-guard', [AttendanceController::class, 'getSatpam']);
+    Route::delete('/presence/{id}/delete', [AttendanceController::class, 'destroy']);
 
 
     Route::get('/location/tracking', [LocationController::class, 'loctrack'])->name('location.tracking');
