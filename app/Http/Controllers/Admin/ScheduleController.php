@@ -8,6 +8,7 @@ use App\Http\Requests\ShiftRequest;
 use App\Models\Guard;
 use App\Models\Schedule;
 use App\Models\Shift;
+use App\Models\Attendance;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 
@@ -43,19 +44,19 @@ class ScheduleController extends Controller {
 
     public function storeGuard(ScheduleRequest $request) {
         $validatedData = $request->validated();
-        
+
         // Get start and end dates
         $startDate = Carbon::parse($validatedData['start_date']);
         $endDate = Carbon::parse($validatedData['end_date']);
-        
+
         // Array untuk mapping hari dalam bahasa Indonesia
         $days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
-        
+
         // Check for existing schedules in the date range
         $currentDate = $startDate->copy();
         while ($currentDate <= $endDate) {
             $dayName = $days[$currentDate->dayOfWeek];
-            
+
             $existingSchedule = Schedule::where('day', $dayName)
                 ->where('schedule_date', $currentDate->format('Y-m-d'))
                 ->where(function ($query) use ($validatedData) {
@@ -66,7 +67,7 @@ class ScheduleController extends Controller {
             if ($existingSchedule) {
                 return redirect('/schedules')->with('info', "Jadwal untuk hari {$dayName} tanggal {$currentDate->format('d/m/Y')} sudah tersedia.");
             }
-            
+
             $currentDate->addDay();
         }
 
@@ -74,14 +75,22 @@ class ScheduleController extends Controller {
         $currentDate = $startDate->copy();
         while ($currentDate <= $endDate) {
             $dayName = $days[$currentDate->dayOfWeek];
-            
-            Schedule::create([
+
+            $schedule = Schedule::create([
                 'guard_id' => $validatedData['guard_id'],
                 'shift_id' => $validatedData['shift_id'],
                 'day' => $dayName,
                 'schedule_date' => $currentDate->format('Y-m-d')
             ]);
-            
+
+            // Create attendance record for this schedule
+            Attendance::create([
+                'guard_id' => $validatedData['guard_id'],
+                'shift_id' => $validatedData['shift_id'],
+                'date' => $currentDate->format('Y-m-d'),
+                'status' => 'Tidak Hadir'
+            ]);
+
             $currentDate->addDay();
         }
 
@@ -100,7 +109,7 @@ class ScheduleController extends Controller {
     public function updateGuard(ScheduleRequest $request, $id) {
         $validatedData = $request->validated();
         $schedule = Schedule::findOrFail($id);
-        
+
         // Check for existing schedules on the same day and date
         $existingSchedule = Schedule::where('day', $validatedData['day'])
             ->where('schedule_date', $validatedData['schedule_date'])
