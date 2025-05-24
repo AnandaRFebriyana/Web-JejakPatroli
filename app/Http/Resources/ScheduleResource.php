@@ -27,13 +27,14 @@ class ScheduleResource extends JsonResource {
             //     'start_time' => $this->shift->start_time,
             //     'end_time' => $this->shift->end_time
             // ],
-            
+
             'id' => $this->id,
             'guard_id' => $this->guard_id,
             'name' => $this->guardRelation->name,
             'day' => $this->day,
             'start_time' => $this->shift->start_time,
-            'end_time' => $this->shift->end_time
+            'end_time' => $this->shift->end_time,
+            'schedule_date' => $this->schedule_date,
         ];
     }
 }
