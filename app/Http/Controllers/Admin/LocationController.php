@@ -30,7 +30,7 @@ class LocationController extends Controller {
     public function loctrack() {
         $locations = Location::with('guardRelation')
             ->orderBy('created_at', 'desc')
-            ->take(10)
+            ->take(10)  
             ->get();
 
         return view('pages.location.locationtrack', [

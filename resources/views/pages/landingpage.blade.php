@@ -632,14 +632,10 @@
             <div class="hero-content" data-aos="fade-right">
                 <h1 class="hero-title">Sistem Pemantauan Patroli Keamanan Modern</h1>
                 <p class="hero-description">
-                    Tingkatkan efektivitas dan akuntabilitas tim keamanan Anda dengan sistem pemantauan real-time yang 
+                    Tingkatkan efektivitas dan akuntabilitas tim keamanan Anda dengan sistem pemantauan real-time yang
                     mudah digunakan. Dilengkapi GPS tracking, pelaporan digital, dan analisis data yang komprehensif.
                 </p>
                 <div class="hero-buttons">
-                    <a href="/register" class="cta-button">
-                        Mulai Sekarang
-                        <i class="fas fa-arrow-right"></i>
-                    </a>
                     <a href="#features" class="cta-button outline">
                         Pelajari Lebih Lanjut
                         <i class="fas fa-info-circle"></i>
@@ -647,7 +643,7 @@
                 </div>
             </div>
             <div class="hero-image" data-aos="fade-left">
-                <img src="{{ asset('assets/img/ip.png') }}" alt="Jejak Patroli Mobile App Interface">
+                <img src="{{ asset('assets/img/mobile-fe.png') }}" alt="Jejak Patroli Mobile App Interface">
             </div>
         </section>
 
@@ -670,13 +666,8 @@
                     </div>
                     <div class="feature-card" data-aos="fade-up" data-aos-delay="300">
                         <i class="fas fa-chart-line feature-icon"></i>
-                        <h3>Analisis Data</h3>
-                        <p>Visualisasi data dan laporan analitis untuk pengambilan keputusan</p>
-                    </div>
-                    <div class="feature-card" data-aos="fade-up" data-aos-delay="400">
-                        <i class="fas fa-bell feature-icon"></i>
-                        <h3>Notifikasi Real-time</h3>
-                        <p>Dapatkan alert instan untuk setiap kejadian penting</p>
+                        <h3>Presensi Digital</h3>
+                        <p>Pencatatan kehadiran secara daring yang efisien dan akurat</p>
                     </div>
                 </div>
             </div>
@@ -734,7 +725,7 @@
                                 </div>
                                 <div class="contact-item">
                                     <i class="fas fa-phone"></i>
-                                    <p>(+62) 83115391209</p>
+                                    <p>+62 831 1539 1209</p>
                                 </div>
                             </div>
                         </div>
@@ -773,28 +764,12 @@
                 <div class="footer-column">
                     <h4>Jejak Patroli</h4>
                     <p>Sistem pemantauan keamanan modern untuk efektivitas dan akuntabilitas yang lebih baik.</p>
-                    <div class="social-links">
-                        <a href="#"><i class="fab fa-facebook"></i></a>
-                        <a href="#"><i class="fab fa-twitter"></i></a>
-                        <a href="#"><i class="fab fa-instagram"></i></a>
-                        <a href="#"><i class="fab fa-linkedin"></i></a>
-                    </div>
-                </div>
-                <div class="footer-column">
-                    <h4>Tautan</h4>
-                    <ul>
-                        <li><a href="/">Beranda</a></li>
-                        <li><a href="#features">Fitur</a></li>
-                        <li><a href="#testimonials">Testimoni</a></li>
-                        <li><a href="/aboutus">Tentang Kami</a></li>
-                    </ul>
                 </div>
                 <div class="footer-column">
                     <h4>Kontak</h4>
                     <ul>
-                        <li><i class="fas fa-phone"></i> +62 123 4567 890</li>
-                        <li><i class="fas fa-envelope"></i> info@jejakpatroli.com</li>
-                        <li><i class="fas fa-map-marker-alt"></i> Jakarta, Indonesia</li>
+                        <li><i class="fas fa-phone"></i> +62 831 1539 1209</li>
+                        <li><i class="fas fa-map-marker-alt"></i> Jl. Mastrip, Krajan Timur, Sumbersari, Kec. Sumbersari, Kabupaten Jember, Jawa Timur 68121</li>
                     </ul>
                 </div>
             </div>
