@@ -19,7 +19,7 @@ class AttendanceController extends Controller {
         $guardId = Auth::guard('guard')->id();
         $attendances = Attendance::where('guard_id', $guardId)
                                   ->whereNotNull('check_in_time')
-                                //   ->whereNotNull('check_out_time')
+                                  ->whereNotNull('check_out_time')
                                   ->whereNotNull('status')
                                   ->orderBy('updated_at', 'desc')
                                   ->get();
@@ -64,9 +64,6 @@ class AttendanceController extends Controller {
         if ($check_in->gt($late_threshold)) {
             $status = 'Terlambat';
         }
-        if ($check_in->lt($shift_start)) {
-            return response()->json(['error' => 'Belum waktunya check-in!']);
-        }
 
         $attendance->update([
             'check_in_time' => $validated['check_in_time'],
@@ -91,8 +88,6 @@ class AttendanceController extends Controller {
     public function checkOut(Request $request, $id) {
         $validated = $request->validate([
             'check_out_time' => 'required|date_format:H:i:s',
-            'longitude' => 'required|numeric',
-            'latitude' => 'required|numeric',
         ]);
 
         $attendance = Attendance::findOrFail($id);
@@ -100,15 +95,7 @@ class AttendanceController extends Controller {
             'check_out_time' => $validated['check_out_time'],
         ]);
 
-        // Save final location
-        Location::create([
-            'attendance_id' => $attendance->id,
-            'guard_id' => Auth::guard('guard')->id(),
-            'latitude' => $validated['latitude'],
-            'longitude' => $validated['longitude'],
-        ]);
-
-        return response()->json(['message' => 'Successfully made a presence.'], 200);
+        return response()->json(['message' => 'Successfully checked out.'], 200);
     }
 
     public function updateLocation(Request $request) {
