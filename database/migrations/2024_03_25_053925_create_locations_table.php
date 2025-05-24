@@ -19,6 +19,7 @@ return new class extends Migration {
             $table->foreignId('guard_id') // Kolom foreign key
                   ->constrained('guards') // Mengacu ke tabel guards
                   ->onDelete('cascade'); // Hapus data jika parent dihapus
+            $table->boolean('is_active')->default(true); // Status tracking aktif/tidak
             $table->timestamps();
         });
     }

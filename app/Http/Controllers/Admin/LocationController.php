@@ -4,38 +4,65 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Location;
-use Barryvdh\DomPDF\Facade\Pdf;
+use App\Models\Attendance;
 use Illuminate\Http\Request;
-use App\Models\TrackingLog;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class LocationController extends Controller {
     /**
      * Display a listing of the resource.
      */
     public function index() {
-        $title = 'Delete!';
-        $text = "Are you sure you want to delete?";
-        $location = Location::with('guardRelation')->get();
-        $logs = TrackingLog::with(['guardRelation.schedules'])->get();
-        confirmDelete($title, $text);
-        $location = Location::with('guardRelation')->orderBy('created_at', 'desc')->first();
+        // Get the latest location for each attendance
+        $locations = Location::with(['guardRelation', 'attendance', 'attendance.shift'])
+            ->select([
+                'locations.id',
+                'locations.guard_id',
+                'locations.attendance_id',
+                'locations.latitude',
+                'locations.longitude',
+                'locations.created_at',
+                'locations.updated_at'
+            ])
+            ->whereIn('locations.id', function($query) {
+                $query->select(DB::raw('MAX(id)'))
+                    ->from('locations')
+                    ->groupBy('attendance_id');
+            })
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
+
+        // Calculate active status based on last update time and attendance status
+        $locations->each(function ($location) {
+            $isWithinTimeLimit = $location->created_at->diffInMinutes(now()) <= 30;
+            $isAttendanceActive = $location->attendance && !$location->attendance->check_out_time;
+            $location->is_active = $isWithinTimeLimit && $isAttendanceActive;
+        });
 
         return view('pages.location.location', [
-            'logs' => $logs,
-            'location' => $location,
             'title' => 'Data Lokasi Patroli',
+            'locations' => $locations,
         ]);
     }
 
     public function loctrack() {
-        $locations = Location::with('guardRelation')
-            ->orderBy('created_at', 'desc')
-            ->take(10)  
-            ->get();
+        // Get all unique attendance IDs that have locations
+        $attendances = Location::select('attendance_id')
+            ->distinct()
+            ->pluck('attendance_id');
+
+        // Get all locations for these attendances
+        $allLocations = Location::whereIn('attendance_id', $attendances)
+            ->with(['guardRelation', 'attendance', 'attendance.shift'])
+            ->orderBy('created_at', 'asc')
+            ->get()
+            ->groupBy('attendance_id');
 
         return view('pages.location.locationtrack', [
             'title' => 'Tracking Lokasi Satpam',
-            'locations' => $locations,
+            'allLocations' => $allLocations,
+            'showAllTracks' => true
         ]);
     }
 
@@ -51,16 +78,18 @@ class LocationController extends Controller {
      */
     public function store(Request $request) {
         $validate = $request->validate([
-            'location_name' => 'required|unique:locations',
-        ],[
-            'location_name.required' => 'Nama Lokasi harus diisi.',
-            'location_name.unique' => 'Nama Lokasi sudah ada.'
+            'latitude' => 'required|numeric',
+            'longitude' => 'required|numeric',
+            'attendance_id' => 'required|exists:attendances,id',
+            'guard_id' => 'required|exists:guards,id',
         ]);
+
         Location::create($validate);
+        
         if ($request->ajax()) {
-            return response()->json(['success' => 'Berhasil menambah data!']);
+            return response()->json(['success' => 'Berhasil menambah data lokasi!']);
         }
-        return redirect('/location')->with('success', 'Berhasil menambah data!');
+        return redirect('/location')->with('success', 'Berhasil menambah data lokasi!');
     }
 
     /**
@@ -71,9 +100,20 @@ class LocationController extends Controller {
     }
 
     public function showtrack(Location $location) {
+        // Get all tracking points for this attendance session
+        $trackingPoints = Location::where('attendance_id', $location->attendance_id)
+            ->orderBy('created_at', 'asc')
+            ->get();
+
+        // Calculate if patrol is still active
+        $isWithinTimeLimit = $location->created_at->diffInMinutes(now()) <= 30;
+        $isAttendanceActive = $location->attendance && !$location->attendance->check_out_time;
+        $location->is_active = $isWithinTimeLimit && $isAttendanceActive;
+        
         return view('pages.location.locationtrack', [
             'title' => 'Tracking Lokasi Satpam',
             'location' => $location,
+            'trackingPoints' => $trackingPoints,
         ]);
     }
 
@@ -83,7 +123,8 @@ class LocationController extends Controller {
     public function edit(Location $location) {
         return response()->json([
             'id' => $location->id,
-            'location_name' => $location->location_name,
+            'latitude' => $location->latitude,
+            'longitude' => $location->longitude,
         ]);
     }
 
@@ -92,16 +133,16 @@ class LocationController extends Controller {
      */
     public function update(Request $request, Location $location) {
         $validate = $request->validate([
-            'location_name' => 'required|unique:locations',
-        ],[
-            'location_name.required' => 'Nama Lokasi harus diisi.',
-            'location_name.unique' => 'Nama Lokasi sudah ada.'
+            'latitude' => 'required|numeric',
+            'longitude' => 'required|numeric',
         ]);
+
         $location->update($validate);
+        
         if ($request->ajax()) {
-            return response()->json(['success' => 'Berhasil mengubah data!']);
+            return response()->json(['success' => 'Berhasil mengubah data lokasi!']);
         }
-        return redirect('/location')->with('success', 'Berhasil mengubah data!');
+        return redirect('/location')->with('success', 'Berhasil mengubah data lokasi!');
     }
 
     /**

@@ -35,3 +35,30 @@ Route::middleware('auth.guard')->group(function () {
 
     Route::post('/logout', [UserController::class, 'logout']);
 });
+
+Route::get('/locations/{location}/latest', function (App\Models\Location $location) {
+    // Get the latest location for the same guard and attendance
+    $latestLocation = App\Models\Location::where('guard_id', $location->guard_id)
+        ->where('attendance_id', $location->attendance_id)
+        ->latest()
+        ->first();
+
+    if (!$latestLocation) {
+        return response()->json(['success' => false, 'message' => 'Location not found']);
+    }
+
+    // Calculate if patrol is still active
+    $isWithinTimeLimit = $latestLocation->created_at->diffInMinutes(now()) <= 30;
+    $isAttendanceActive = $latestLocation->attendance && !$latestLocation->attendance->check_out_time;
+    $latestLocation->is_active = $isWithinTimeLimit && $isAttendanceActive;
+
+    return response()->json([
+        'success' => true,
+        'location' => [
+            'latitude' => $latestLocation->latitude,
+            'longitude' => $latestLocation->longitude,
+            'created_at' => $latestLocation->created_at,
+            'is_active' => $latestLocation->is_active
+        ]
+    ]);
+});

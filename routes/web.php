@@ -26,17 +26,15 @@ Route::middleware('auth:admin')->group(function (){
     Route::put('/guard/update/{id}', [GuardController::class, 'updatePass']);
     Route::put('/guard/{id}/delete', [GuardController::class, 'destroy']);
 
-
     Route::resource('/presence', AttendanceController::class);
     Route::post('/get-guard', [AttendanceController::class, 'getSatpam']);
     Route::delete('/presence/{id}/delete', [AttendanceController::class, 'destroy']);
 
-
     Route::get('/location/tracking', [LocationController::class, 'loctrack'])->name('location.tracking');
     Route::get('/location/tracking/{location}', [LocationController::class, 'showtrack'])->name('location.showtrack');
-    Route::resource('/location', LocationController::class)->only('index','show');
+    Route::resource('/location', LocationController::class);
+    
     Route::resource('/report', ReportController::class);
-
 
     Route::controller(ScheduleController::class)->group(function () {
         Route::get('/schedules', 'index');

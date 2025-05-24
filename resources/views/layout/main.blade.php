@@ -4,17 +4,17 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="apple-touch-icon" sizes="100x100" href="{{ asset('assets/img/logo-jejakpatroli.png') }}" />
-    <link rel="icon" type="image/png" href="{{ asset('assets/img/logo-jejakpatroli.png') }}" />
-    <title>Jejak Patroli</title>
+    <link rel="icon" type="image/png" href="{{ asset('img/logo.png') }}" />
+    <title>{{ $title }} - Jejak Patroli</title>
 
     {{-- Bootstrap --}}
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 
     <!-- Google Fonts - Open Sans -->
-    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- Font Awesome Icons from CDNJS -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 
     <!-- Nucleo Icons -->
     <link href="{{ asset('assets/css/nucleo-icons.css') }}" rel="stylesheet" />
@@ -29,7 +29,14 @@
     <style>
       /* Custom Styling */
       body {
-        font-family: 'Open Sans', sans-serif; /* Apply Open Sans for text */
+        font-family: 'Open Sans', sans-serif;
+        background-color: #f8f9fa;
+      }
+
+      .bg-tosca {
+        background-color: #1e4b81;  /* Darker blue */
+        opacity: 0.9;
+        z-index: 0;
       }
 
       input[type="date"]::-webkit-calendar-picker-indicator,
@@ -40,13 +47,30 @@
       input[type="password"] {
         margin-right: 0.7rem; 
       }
+
+      .main-content {
+        background-color: #f8f9fa;
+        min-height: 100vh;
+      }
+
+      .top-navbar {
+        background-color: #fff;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      }
+
+      .card {
+        background-color: #fff;
+        border: none;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      }
     </style>
+
+    @yield('styles')
   </head>
-  <body class="m-0 font-sans text-base antialiased font-normal dark:bg-slate-900 leading-default bg-gray-50 text-slate-500">
-    <div class="absolute w-full bg-tosca dark:hidden min-h-75"></div>
+  <body class="bg-light">
+    <div class="absolute w-full bg-tosca min-h-75"></div>
     @include('layout.sidebar')
     
-    {{-- @include('vendor.bootstrap.toast') --}}
     <main class="relative h-full max-h-screen transition-all duration-200 ease-in-out xl:ml-68 rounded-xl">
       @include('layout.navbar')
       
@@ -56,21 +80,14 @@
         @include('sweetalert::alert')
       </div>
       {{-- end content --}}
-
     </main>
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    @stack('scripts')
   </body>
-
-  <!-- Scripts -->
-  <script src="{{ asset('assets/js/search.js') }}"></script>
-  {{-- Bootstrap JS --}}
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script src="{{ asset('assets/js/modal.js') }}"></script>
-
-  <!-- Plugin for charts  -->
-  <script src="{{ asset('assets/js/plugins/chartjs.min.js') }}" async></script>
-  <!-- Plugin for scrollbar  -->
-  <script src="{{ asset('assets/js/plugins/perfect-scrollbar.min.js') }}" async></script>
-  <!-- Main script file  -->
-  <script src="{{ asset('assets/js/argon-dashboard-tailwind.js?v=1.0.1') }}" async></script>
 </html>
