@@ -20,11 +20,20 @@ class ScheduleController extends Controller {
         confirmDelete($title, $text);
 
         $day = $request->input('day');
+        $today = Carbon::today()->format('Y-m-d');
 
-        $schedules = Schedule::when($day,
-        function ($query) use ($day) {
-            $query->where('day', $day);
-        })->latest('id')->paginate(10);
+        $schedules = Schedule::query()
+            ->join('shifts', 'schedules.shift_id', '=', 'shifts.id')
+            ->where('schedule_date', '>=', $today)
+            ->when($day,
+                function ($query) use ($day) {
+                    $query->where('day', $day);
+                })
+            ->orderBy('schedule_date', 'asc')
+            ->orderByRaw("FIELD(day, 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu')")
+            ->orderBy('shifts.start_time', 'asc')
+            ->select('schedules.*')
+            ->paginate(10);
 
         return view('pages.schedule.schedule', [
             'title' => 'Data Jadwal',

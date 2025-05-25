@@ -23,6 +23,21 @@
                   </div>
                 </div> --}}
             </div>
+
+            {{-- Search Form --}}
+            <div class="flex flex-wrap mt-4 px-6">
+                <form action="{{ route('presence.index') }}" method="GET" class="flex flex-wrap w-full">
+                    <div class="mb-4 mr-4 flex flex-col relative">
+                        <label for="search" class="inline-block mb-2 ml-1 font-bold text-xs text-slate-700 dark:text-white/80">Cari</label>
+                        <input type="text" id="search" name="search" value="{{ request('search') }}" placeholder="Nama Satpam, Jam Kerja, Tanggal, Status"
+                            class="focus:shadow-primary-outline dark:bg-slate-850 dark:text-white text-sm leading-5.6 ease block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding px-3 py-2 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:border-blue-500 focus:outline-none" style="max-width: 300px;">
+                    </div>
+                    <div class="mb-4 mr-4 flex flex-col relative justify-end">
+                        <button type="submit" class="inline-block px-8 py-2 font-bold leading-normal text-center text-white align-middle transition-all ease-in bg-blue-500 border-0 rounded-lg shadow-md cursor-pointer text-xs tracking-tight-rem hover:shadow-xs hover:-translate-y-px active:opacity-85">Cari</button>
+                    </div>
+                </form>
+            </div>
+
             <div class="flex-auto px-0 pt-0 pb-2">
               <div class="p-0 overflow-x-auto">
 
@@ -99,7 +114,6 @@
                       {{ $attendances->links() }}
                   </div>
                 </div>
-              </div>
             </div>
           </div>
         </div>
