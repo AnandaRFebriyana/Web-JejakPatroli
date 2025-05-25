@@ -82,7 +82,7 @@
                         data-guard-id="{{ $guard->id }}" data-bs-toggle="modal" data-bs-target="#passModalEdit">Ubah Password</a></li>
                     </ul>
                   </div>
-                  
+
                   {{-- <a href="/guard/{{ $guard->id }}"  data-confirm-delete="true">
                     <i class="fas fa-trash-alt" aria-hidden="true"></i>
                   </a> --}}
@@ -118,3 +118,18 @@
   </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+    $(document).ready(function() {
+        let searchTimeout;
+        $('#search').on('input', function() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                let searchValue = $(this).val();
+                window.location.href = '/guard?search=' + searchValue;
+            }, 500);
+        });
+    });
+</script>
+@endpush

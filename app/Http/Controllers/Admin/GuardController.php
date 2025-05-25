@@ -13,16 +13,21 @@ class GuardController extends Controller {
     /**
      * Display a listing of the resource.
      */
-    public function index() {
+    public function index(Request $request) {
         $title = 'Hapus!';
         $text = "Apakah anda yakin ingin menghapusnya?";
         confirmDelete($title, $text);
 
-        $guards = Guard::paginate(5);
+        $search = $request->input('search');
+        $guards = Guard::when($search, function($query) use ($search) {
+            $query->where('name', 'like', '%' . $search . '%')
+                  ->orWhere('email', 'like', '%' . $search . '%')
+                  ->orWhere('phone_number', 'like', '%' . $search . '%')
+                  ->orWhere('address', 'like', '%' . $search . '%');
+        })->paginate(5);
 
         return view('pages.guard.guard', compact('guards'), [
             'title' => 'Data Satpam'
-
         ]);
     }
 
