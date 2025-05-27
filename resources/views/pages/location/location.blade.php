@@ -50,7 +50,13 @@
                                 </td>
                                 <td class="p-2 align-middle bg-transparent border-b whitespace-nowrap shadow-transparent">
                                     <p class="mb-0 text-xs font-semibold leading-tight dark:text-white dark:opacity-80">
-                                        {{ \Carbon\Carbon::parse($location->attendance->check_in_time)->format('d M Y H:i') }}
+                                        @if($location->attendance->date && $location->attendance->check_in_time)
+                                            {{ \Carbon\Carbon::parse($location->attendance->date)
+                                                ->setTimeFromTimeString($location->attendance->check_in_time)
+                                                ->format('d M Y H:i') }}
+                                        @else
+                                            -
+                                        @endif
                                     </p>
                                 </td>
                                 <td class="p-2 align-middle bg-transparent border-b whitespace-nowrap shadow-transparent">
