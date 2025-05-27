@@ -25,27 +25,34 @@
     @yield('content')
 
 </body>
+<!-- plugin for scrollbar  -->
+<script src="{{ asset('../assets/js/plugins/perfect-scrollbar.min.js') }}"></script>
+<!-- dropdown script -->
+<script src="{{ asset('../assets/js/dropdown.js') }}"></script>
+<!-- main script file  -->
+<script src="{{ asset('../assets/js/argon-dashboard-tailwind.js?v=1.0.1') }}"></script>
 <script>
-    const elements = document.querySelectorAll('.typing-animation');
+    // Initialize after all scripts are loaded
+    window.addEventListener('load', function() {
+        console.log('All resources loaded');
+        
+        // Initialize typing animation
+        const elements = document.querySelectorAll('.typing-animation');
+        elements.forEach(element => {
+            const text = element.innerText;
+            element.setAttribute('data-text', text);
+            element.innerText = '';
 
-    elements.forEach(element => {
-        const text = element.innerText;
-        element.setAttribute('data-text', text);
-        element.innerText = '';
+            let index = 0;
+            setInterval(() => {
+                element.innerText = element.getAttribute('data-text').slice(0, index);
+                index++;
 
-        let index = 0;
-        setInterval(() => {
-            element.innerText = element.getAttribute('data-text').slice(0, index);
-            index++;
-
-            if (index > text.length) {
-                index = 0;
-            }
-        }, 270);
+                if (index > text.length) {
+                    index = 0;
+                }
+            }, 270);
+        });
     });
 </script>
-<!-- plugin for scrollbar  -->
-<script src="{{ asset('../assets/js/plugins/perfect-scrollbar.min.js') }}" async></script>
-<!-- main script file  -->
-<script src="{{ asset('../assets/js/argon-dashboard-tailwind.js?v=1.0.1') }}" async></script>
 </html>
