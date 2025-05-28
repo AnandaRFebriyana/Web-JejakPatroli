@@ -4,6 +4,28 @@
         <div class="flex flex-wrap -mx-3">
           <div class="w-full max-w-full px-3 md:flex-none">
             <div class="relative flex flex-col min-w-0 break-words bg-white border-0 shadow-xl dark:bg-slate-850 dark:shadow-dark-xl rounded-2xl bg-clip-border">
+              <!-- Search Form -->
+              <div class="p-6 border-b border-slate-200 dark:border-slate-700">
+                <form action="{{ route('report.index') }}" method="GET" class="flex flex-wrap items-end gap-4">
+                  <div class="mb-4 mr-4 flex flex-col relative">
+                    <label for="search" class="inline-block mb-2 ml-1 font-bold text-xs text-slate-700 dark:text-white/80">Cari Laporan</label>
+                    <input type="text" 
+                           id="search" 
+                           name="search" 
+                           value="{{ request('search') }}" 
+                           placeholder="Nama Satpam, Tanggal dd-mm-yyyy"
+                           class="focus:shadow-primary-outline dark:bg-slate-850 dark:text-white text-sm leading-5.6 ease block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding px-3 py-2 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:border-blue-500 focus:outline-none"
+                           style="max-width: 300px;">
+                  </div>
+                  <div class="mb-4">
+                    <button type="submit" 
+                            class="inline-block px-6 py-2 font-bold text-center text-white uppercase align-middle transition-all rounded-lg cursor-pointer bg-gradient-to-tl from-blue-500 to-violet-500 leading-pro text-xs ease-soft-in tracking-tight-soft shadow-soft-md bg-150 bg-x-25 hover:scale-102 hover:shadow-soft-xs active:opacity-85">
+                      <i class="fas fa-search mr-2"></i>Cari
+                    </button>
+                  </div>
+                </form>
+              </div>
+
               <div class="flex-auto p-6">
                 <div class="flex flex-wrap -mx-3">
                   @foreach ($reports as $report)
