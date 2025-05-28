@@ -5,7 +5,28 @@
     <div class="flex-none w-full max-w-full px-3">
         <div class="relative flex flex-col min-w-0 mb-6 break-words bg-white border-0 border-transparent border-solid shadow-xl dark:bg-slate-850 dark:shadow-dark-xl rounded-2xl bg-clip-border">
             <div class="p-6 pb-0 mb-0 border-b-0 border-b-solid rounded-t-2xl border-b-transparent">
-                <h6 class="dark:text-white">{{ $title }}</h6>
+                <div class="flex justify-between items-center">
+                    <h6 class="dark:text-white">{{ $title }}</h6>
+                    <!-- Search Form -->
+                    <form action="{{ route('location.index') }}" method="GET" class="flex items-end gap-4">
+                        <div class="mb-4 mr-4 flex flex-col relative">
+                            <label for="search" class="inline-block mb-2 ml-1 font-bold text-xs text-slate-700 dark:text-white/80">Cari</label>
+                            <input type="text" 
+                                   id="search" 
+                                   name="search" 
+                                   value="{{ request('search') }}" 
+                                   placeholder="Nama Satpam"
+                                   class="focus:shadow-primary-outline dark:bg-slate-850 dark:text-white text-sm leading-5.6 ease block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding px-3 py-2 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:border-blue-500 focus:outline-none"
+                                   style="max-width: 300px;">
+                        </div>
+                        <div class="mb-4">
+                            <button type="submit" 
+                                    class="inline-block px-6 py-2 font-bold text-center text-white uppercase align-middle transition-all rounded-lg cursor-pointer bg-gradient-to-tl from-blue-500 to-violet-500 leading-pro text-xs ease-soft-in tracking-tight-soft shadow-soft-md bg-150 bg-x-25 hover:scale-102 hover:shadow-soft-xs active:opacity-85">
+                                <i class="fas fa-search mr-2"></i>Cari
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
             <div class="flex-auto px-0 pt-0 pb-2">
                 <div class="p-6 overflow-x-auto">

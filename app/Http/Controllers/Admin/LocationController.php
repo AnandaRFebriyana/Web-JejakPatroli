@@ -13,9 +13,9 @@ class LocationController extends Controller {
     /**
      * Display a listing of the resource.
      */
-    public function index() {
+    public function index(Request $request) {
         // Get the latest location for each attendance
-        $locations = Location::with(['guardRelation', 'attendance', 'attendance.shift'])
+        $query = Location::with(['guardRelation', 'attendance', 'attendance.shift'])
             ->select([
                 'locations.id',
                 'locations.guard_id',
@@ -29,9 +29,19 @@ class LocationController extends Controller {
                 $query->select(DB::raw('MAX(id)'))
                     ->from('locations')
                     ->groupBy('attendance_id');
-            })
-            ->orderBy('created_at', 'desc')
-            ->paginate(10);
+            });
+
+        // Add search functionality
+        if ($request->has('search')) {
+            $search = $request->search;
+            $query->whereHas('guardRelation', function($q) use ($search) {
+                $q->where('name', 'like', '%' . $search . '%');
+            });
+        }
+
+        $locations = $query->orderBy('created_at', 'desc')
+            ->paginate(10)
+            ->withQueryString();
 
         // Calculate active status based on last update time and attendance status
         $locations->each(function ($location) {
