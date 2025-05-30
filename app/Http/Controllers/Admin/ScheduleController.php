@@ -23,17 +23,19 @@ class ScheduleController extends Controller {
         $today = Carbon::today()->format('Y-m-d');
 
         $schedules = Schedule::query()
-            ->join('shifts', 'schedules.shift_id', '=', 'shifts.id')
-            ->where('schedule_date', '>=', $today)
+            ->with(['shift', 'guardRelation']) // Eager load relationships
+            ->where('schedule_date', '>=', $today) // Hanya tampilkan jadwal hari ini dan ke depan
             ->when($day,
                 function ($query) use ($day) {
                     $query->where('day', $day);
                 })
             ->orderBy('schedule_date', 'asc')
             ->orderByRaw("FIELD(day, 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu')")
-            ->orderBy('shifts.start_time', 'asc')
-            ->select('schedules.*')
+            ->orderBy('shift_id', 'asc')
             ->paginate(10);
+
+        // Hapus jadwal yang sudah lewat
+        Schedule::where('schedule_date', '<', $today)->delete();
 
         return view('pages.schedule.schedule', [
             'title' => 'Data Jadwal',

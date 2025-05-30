@@ -65,7 +65,20 @@ $(document).ready(function () {
         });
         $('#guard_id').val(guardId);
         $('#formEdit').attr('action', '/guard/update/' + guardId);
-        $('#updateModal').modal('show');
+        $('#passModalEdit').modal('show');
+    });
+
+    // Validasi password
+    $('#formEdit').on('submit', function(e) {
+        var password = $('#password').val();
+        var passwordConfirmation = $('#password_confirmation').val();
+        
+        if (password !== passwordConfirmation) {
+            e.preventDefault();
+            $('#password_confirmation').addClass('is-invalid');
+            $('#password_confirmation').next('.invalid-feedback').html('Konfirmasi password tidak cocok');
+            return false;
+        }
     });
 });
 
@@ -79,7 +92,7 @@ function handleFormSubmit(formId, modalId) {
 
         $.ajax({
             url: form.attr('action'),
-            type: 'POST',
+            type: form.find('input[name="_method"]').val() || 'POST',
             data: formData,
             success: function(response) {
                 $(modalId).modal('hide');
@@ -126,6 +139,6 @@ function removeFormErrors(formId) {
 
 handleFormSubmit('#shiftModal form', '#shiftModal');
 handleFormSubmit('#locModal form', '#locModal');
-handleFormSubmit('#passModalEdit form', '#passModalEdit');
+handleFormSubmit('#formEdit', '#passModalEdit');
 handleFormSubmit('#shiftModalEdit form', '#shiftModalEdit');
 handleFormSubmit('#locModalEdit form', '#locModalEdit');

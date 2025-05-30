@@ -57,7 +57,7 @@
                                         <p class="mb-0 text-xs leading-tight dark:text-white dark:opacity-80 text-slate-400">{{ $schedule->day }}</p>
                                     </td>
                                     <td class="p-2 text-center align-middle bg-transparent border-b dark:border-white/40 whitespace-nowrap shadow-transparent">
-                                        <p class="mb-0 text-xs leading-tight dark:text-white dark:opacity-80 text-slate-400">{{ $schedule->shift->start_time }} - {{ $schedule->shift->end_time }}</p>
+                                        <p class="mb-0 text-xs leading-tight dark:text-white dark:opacity-80 text-slate-400">{{ $schedule->shift->shift_name }} ({{ $schedule->shift->start_time }} - {{ $schedule->shift->end_time }})</p>
                                     </td>
                                     <td class="p-2 text-center align-middle bg-transparent border-b dark:border-white/40 whitespace-nowrap shadow-transparent">
                                         <p class="mb-0 text-xs leading-tight dark:text-white dark:opacity-80 text-slate-400">
@@ -134,8 +134,7 @@
                                         <p class="mb-0 text-xs leading-tight text-slate-400">{{ $shift->end_time }}</p>
                                     </td>
                                     <td class="p-2 text-center align-middle bg-transparent border-b whitespace-nowrap shadow-transparent">
-                                        <a href="javascript:void(0);" class="btn btn-secondary text-xs border-0 shiftModalEditLink"
-                                            data-shift-id="{{ $shift->id }}" data-bs-toggle="modal" data-bs-target="#shiftModalEdit">
+                                        <a href="javascript:void(0);" onclick="editShift({{ $shift->id }})" class="btn btn-secondary text-xs border-0">
                                             <i class="fas fa-edit" aria-hidden="true"></i>
                                         </a>
                                         |
