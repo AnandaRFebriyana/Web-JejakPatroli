@@ -168,11 +168,19 @@ class GuardController extends Controller {
         $validatedData = $request->validate($rules, [
             'password.required' => 'Password harus di isi',
             'password.min' => 'Password harus memiliki minimal :min karakter.',
-            'password.regex' => 'Password harus mengandung angka atau simbol.',
+            'password.regex' => 'Password harus mengandung angka dan simbol (contoh simbol: !@#$%^&*).',
             'password.confirmed' => 'Konfirmasi password tidak cocok.',
         ]);
 
         if ($request->filled('password')) {
+            // Cek apakah password baru sama dengan password lama
+            if (Hash::check($request->password, $guard->password)) {
+                if ($request->ajax()) {
+                    return response()->json(['error' => 'Password baru tidak boleh sama dengan password lama.'], 422);
+                }
+                return redirect('/guard')->with('error', 'Password baru tidak boleh sama dengan password lama.');
+            }
+
             $validatedData['password'] = Hash::make($validatedData['password']);
             $guard->update(['password' => $validatedData['password']]);
 
@@ -181,6 +189,9 @@ class GuardController extends Controller {
             }
             return redirect('/guard')->with('success', 'Berhasil mengubah password!');
         } else {
+            if ($request->ajax()) {
+                return response()->json(['error' => 'Password tidak diisi!'], 422);
+            }
             return redirect('/guard')->with('error', 'Password tidak diisi!');
         }
     }

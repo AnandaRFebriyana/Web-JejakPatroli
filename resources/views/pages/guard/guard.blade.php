@@ -79,7 +79,7 @@
                       <li><a class="dropdown-item mb-0 text-xs leading-tight dark:text-white dark:opacity-80 text-slate-400" href="/guard/{{ $guard->id }}/edit">Ubah Data</a></li>
                       <li><hr class="dropdown-divider"></li>
                       <li><a class="dropdown-item mb-0 text-xs leading-tight dark:text-white dark:opacity-80 text-slate-400 passModalEditLink" href="javascript:void(0);"
-                        data-guard-id="{{ $guard->id }}" data-bs-toggle="modal" data-bs-target="#passModalEdit">Ubah Password</a></li>
+                        data-guard-id="{{ $guard->id }}">Ubah Password</a></li>
                     </ul>
                   </div>
 
@@ -122,6 +122,7 @@
 @push('scripts')
 <script>
     $(document).ready(function() {
+        // Search functionality
         let searchTimeout;
         $('#search').on('input', function() {
             clearTimeout(searchTimeout);
@@ -129,6 +130,27 @@
                 let searchValue = $(this).val();
                 window.location.href = '/guard?search=' + searchValue;
             }, 500);
+        });
+
+        // Password modal functionality
+        $('.passModalEditLink').on('click', function() {
+            var guardId = $(this).data('guard-id');
+            console.log('Guard ID:', guardId);
+            
+            $.ajax({
+                url: '/guard/' + guardId + '/account',
+                type: 'GET',
+                success: function(data) {
+                    console.log('Account data:', data);
+                    $('#passModalEdit #email').val(data.email);
+                    $('#guard_id').val(guardId);
+                    $('#formEdit').attr('action', '/guard/update/' + guardId);
+                    $('#passModalEdit').modal('show');
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error:', error);
+                }
+            });
         });
     });
 </script>
